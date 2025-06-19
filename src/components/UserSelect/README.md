@@ -16,9 +16,9 @@
 - _UserSelect(@components/UserSelect)
 
 ```jsx
-const {default:UserSelect} = _UserSelect;
-const BaseExample = ()=>{
-    return <UserSelect />;
+const { default: UserSelect } = _UserSelect;
+const BaseExample = () => {
+  return <UserSelect />;
 };
 
 render(<BaseExample />);

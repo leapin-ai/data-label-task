@@ -23,39 +23,51 @@ const BaseExample = createWithRemoteLoader({
 })(({ remoteModules }) => {
   const [PureGlobal, usePreset, Layout] = remoteModules;
   const { ajax } = usePreset();
-  return (<PureGlobal
-    preset={{
-      ajax, apis: {
-        testApi: {
-          getList: {
-            loader: () => {
-              return {
-                pageData: [{
-                  id: 1, name: '测试数据', description: '测试测试测试测试测试测试测试', createdTime: new Date()
-                }], totalCount: 1
-              };
-            }
-          }, add: {
-            loader: () => {
-              return null;
-            }
-          }, save: {
-            loader: () => {
-              return null;
-            }
-          }, remove: {
-            loader: () => {
-              return null;
+  return (
+    <PureGlobal
+      preset={{
+        ajax,
+        apis: {
+          testApi: {
+            getList: {
+              loader: () => {
+                return {
+                  pageData: [
+                    {
+                      id: 1,
+                      name: '测试数据',
+                      description: '测试测试测试测试测试测试测试',
+                      createdTime: new Date()
+                    }
+                  ],
+                  totalCount: 1
+                };
+              }
+            },
+            add: {
+              loader: () => {
+                return null;
+              }
+            },
+            save: {
+              loader: () => {
+                return null;
+              }
+            },
+            remove: {
+              loader: () => {
+                return null;
+              }
             }
           }
         }
-      }
-    }}
-  >
-    <Layout navigation={{ isFixed: false }}>
-      <List />
-    </Layout>
-  </PureGlobal>);
+      }}
+    >
+      <Layout navigation={{ isFixed: false }}>
+        <List />
+      </Layout>
+    </PureGlobal>
+  );
 });
 
 render(<BaseExample />);
@@ -95,25 +107,29 @@ const BaseExample = createWithRemoteLoader({
   modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
 })(({ remoteModules }) => {
   const [PureGlobal, Layout] = remoteModules;
-  return (<PureGlobal
-    preset={{
-      apis: {
-        testApi: {
-          getDetail: {
-            loader: () => {
-              return {
-                id: '1212121212', name: '测试测试测试', description: '描述描述描述描述描述描述描述描述'
-              };
+  return (
+    <PureGlobal
+      preset={{
+        apis: {
+          testApi: {
+            getDetail: {
+              loader: () => {
+                return {
+                  id: '1212121212',
+                  name: '测试测试测试',
+                  description: '描述描述描述描述描述描述描述描述'
+                };
+              }
             }
           }
         }
-      }
-    }}
-  >
-    <Layout navigation={{ isFixed: false }}>
-      <Detail optionFixed={false} />
-    </Layout>
-  </PureGlobal>);
+      }}
+    >
+      <Layout navigation={{ isFixed: false }}>
+        <Detail optionFixed={false} />
+      </Layout>
+    </PureGlobal>
+  );
 });
 
 render(<BaseExample />);
@@ -131,14 +147,17 @@ const BaseExample = createWithRemoteLoader({
   modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
 })(({ remoteModules }) => {
   const [PureGlobal, Layout] = remoteModules;
-  return (<PureGlobal
+  return (
+    <PureGlobal
       preset={{
         apis: {
           testApi: {
             getDetail: {
               loader: () => {
                 return {
-                  id: '1212121212', name: '测试测试测试', description: '描述描述描述描述描述描述描述描述'
+                  id: '1212121212',
+                  name: '测试测试测试',
+                  description: '描述描述描述描述描述描述描述描述'
                 };
               }
             }
@@ -149,7 +168,8 @@ const BaseExample = createWithRemoteLoader({
       <Layout navigation={{ isFixed: false }}>
         <TabDetail optionFixed={false} />
       </Layout>
-    </PureGlobal>);
+    </PureGlobal>
+  );
 });
 
 render(<BaseExample />);

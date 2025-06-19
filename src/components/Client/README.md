@@ -16,9 +16,9 @@
 - _Client(@components/Client)
 
 ```jsx
-const {default:Client} = _Client;
-const BaseExample = ()=>{
-    return <Client />;
+const { default: Client } = _Client;
+const BaseExample = () => {
+  return <Client />;
 };
 
 render(<BaseExample />);
