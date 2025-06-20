@@ -76,7 +76,8 @@ module.exports = fp(async (fastify, options) => {
               [Op.gt]: taskCaseId
             },
             isCompleted: false
-          }
+          },
+          order: [['id', 'ASC']]
         });
       }
       if (taskCaseId && vector === 'prev') {

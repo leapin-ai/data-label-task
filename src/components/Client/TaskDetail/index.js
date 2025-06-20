@@ -40,7 +40,7 @@ const CaseDetail = createWithRemoteLoader({
               <LoadingButton
                 type="primary"
                 onClick={async () => {
-                  const { data: resData } = ajax(Object.assign({}, apis.client.taskCase.complete, { data: { id: data.task.id } }));
+                  const { data: resData } = await ajax(Object.assign({}, apis.client.taskCase.complete, { data: { id: data.task.id } }));
                   if (resData.code !== 0) {
                     return;
                   }
