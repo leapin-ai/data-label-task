@@ -31,6 +31,7 @@ const createServer = () => {
       properties: {
         DB_DIALECT: { type: 'string', default: 'sqlite' },
         DB_HOST: { type: 'string', default: 'data.db' },
+        DB_PORT: { type: 'number', default: 3306 },
         DB_USERNAME: { type: 'string' },
         DB_PASSWORD: { type: 'string' },
         DB_DATABASE: { type: 'string' },
@@ -57,6 +58,7 @@ const createServer = () => {
         db: {
           dialect: fastify.config.DB_DIALECT,
           host: fastify.config.DB_HOST,
+          port: fastify.config.DB_PORT,
           database: fastify.config.DB_DATABASE,
           username: fastify.config.DB_USERNAME,
           password: fastify.config.DB_PASSWORD
