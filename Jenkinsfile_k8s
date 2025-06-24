@@ -1,10 +1,12 @@
 @Library(['leapin-pipeline']) _
 
 standardK8sPipelineV2 {
-    projectName = "video-conf-service"
+    projectName = "data-label-service"
     isMultiBranch = true
     isWebCdn = true
-    imageRepo = "video-conf-service"
-    deployBranch = ['master', 'develop', 'add-cdn-support']
-    deployBranchEnvMap = ['master': 'prod', 'main': 'prod', 'develop': 'staging', 'add-cdn-support': 'staging']
+    imageRepo = "data-label-service"
+    deployBranch = []
+    deployBranchEnvMap = []
+    deployBranchCn = ['develop']
+    deployBranchCnEnvMap = ['develop': 'staging']
 }
