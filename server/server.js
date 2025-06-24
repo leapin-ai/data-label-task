@@ -61,6 +61,9 @@ const createServer = () => {
           username: fastify.config.DB_USERNAME,
           password: fastify.config.DB_PASSWORD
         },
+        getUserModel: () => {
+          return fastify.account.models.user;
+        },
         modelsGlobOptions: {
           syncOptions: {}
         }
