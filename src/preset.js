@@ -9,7 +9,9 @@ import { getApis } from '@components/Apis';
 import { enums as projectEnums } from '@components/Project';
 
 window.PUBLIC_URL = window.runtimePublicUrl || process.env.PUBLIC_URL;
-
+const cdnHost = window.runtimeEnv?.['cdnHost'] || 'https://cdn.leapin-ai.com';
+const appName = 'data-label-service';
+const env = window.runtimeEnv?.['env'] || 'local';
 const baseApiUrl = window.runtimeApiUrl || '';
 
 export const globalInit = async () => {
@@ -18,10 +20,20 @@ export const globalInit = async () => {
     errorHandler: error => message.error(error),
     getDefaultHeaders: () => {
       return {
-        'X-User-Token': getToken('X-User-Token')
+        'X-User-Token': getToken('X-User-Token'),
+        appName,
+        env
       };
     },
     registerInterceptors: interceptors => {
+      interceptors.request.use(config => {
+        if (config.headers['env'] !== 'local') {
+          config.baseURL = `${config.baseURL}/${config.headers['appName']}/${config.headers['env']}`;
+        }
+        delete config.headers['appName'];
+        delete config.headers['env'];
+        return config;
+      });
       interceptors.response.use(response => {
         if (response.status === 401 || response.data.code === 401) {
           const searchParams = new URLSearchParams(window.location.search);
@@ -105,7 +117,8 @@ export const globalInit = async () => {
               defaultVersion: process.env.DEFAULT_VERSION
             }
           : {
-              ...registry,
+              url: cdnHost,
+              tpl: `{{url}}/${appName}/${env}`,
               remote: 'data-label-task',
               defaultVersion: process.env.DEFAULT_VERSION
             }
