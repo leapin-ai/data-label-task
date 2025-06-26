@@ -42,6 +42,11 @@ const App = createWithRemoteLoader({
                     key: 'file',
                     title: '文件管理',
                     path: '/admin/file'
+                  },
+                  {
+                    key: 'signature',
+                    title: '密钥管理',
+                    path: '/admin/signature'
                   }
                 ]
               }}
@@ -54,6 +59,7 @@ const App = createWithRemoteLoader({
           <Route path="task/:id" element={<RemoteLoader key="task-detail" module="data-label-task:Task@TabDetail" />} />
           <Route path="task" element={<RemoteLoader key="task" module="data-label-task:Task@List" />} />
           <Route path="file" element={<RemoteLoader module="components-file-manager:FileListPage" />} />
+          <Route path="signature" element={<RemoteLoader module="components-admin:Signature" />} />
           <Route path="*" element={<Admin baseUrl={`${baseUrl}/admin`} />} />
         </Route>
         <Route
@@ -71,7 +77,7 @@ const App = createWithRemoteLoader({
         <Route element={<BeforeLoginLayout />}>
           <Route path="error" element={<Error />} />
           <Route path="404" element={<NotFound />} />
-          <Route path="account/*" element={<Account baseUrl={baseUrl + '/account'} />} />
+          <Route path="account/*" element={<Account baseUrl={baseUrl + '/account'} systemName="LeapIn数据标注平台" systemLogo={window.PUBLIC_URL + '/favicon.svg'} />} />
         </Route>
       </Routes>
     </Global>
