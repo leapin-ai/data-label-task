@@ -9,7 +9,7 @@
     "start-server": "cd server && npm run dev",
     "start-frontend": "cross-env PORT=3040 MODULES_DEV_PUBLIC_URL=/ COMPONENTS_NAME=data-label-task craco start",
     "build": "cross-env COMPONENTS_NAME=data-label-task MODULES_DEV_PUBLIC_URL=/ craco build",
-    "cdn-inject": "cross-env OUTPUT_HTML_PATH=build/entry-${LANDSCAPE:-cn}-${DEPLOY_ENV:-staging}.html DEPLOY_URL=${CDN_URL:-/} API_URL=https://api.gw.leapin-ai.com RUNTIME_ENV='env:${DEPLOY_ENV};landscape:${LANDSCAPE}' npx @kne/npm-tools entryHtml",
+    "cdn-inject": "cross-env OUTPUT_HTML_PATH=build/entry-${LANDSCAPE:-cn}-${DEPLOY_ENV:-staging}.html DEPLOY_URL=${CDN_URL:-/} API_URL=${GW_HOST} RUNTIME_ENV='env:${DEPLOY_ENV};landscape:${LANDSCAPE};cdnHost:${CDN_HOST}' npx @kne/npm-tools entryHtml",
     "deploy": "cross-env OUTPUT_HTML_PATH=build/entry.html DEPLOY_URL=/ API_URL=https://api.gw.leapin-ai.com RUNTIME_ENV='env:staging' npx @kne/npm-tools entryHtml",
     "deploy-prod": "cross-env OUTPUT_HTML_PATH=build/entry-prod.html DEPLOY_URL=/ API_URL=https://api.gw.leapin-ai.com RUNTIME_ENV='env:prod' npx @kne/npm-tools entryHtml",
     "deploy-ap": "cross-env OUTPUT_HTML_PATH=build/entry-ap.html DEPLOY_URL=/ API_URL=https://api.gw.leapin-ai.com RUNTIME_ENV='env:ap' npx @kne/npm-tools entryHtml",
