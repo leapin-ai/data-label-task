@@ -13,11 +13,12 @@
 
 - 列表页
 - 列表页
-- remoteLoader(@kne/remote-loader),_Task(@components/Task)
+- remoteLoader(@kne/remote-loader),_Task(@components/Task),_mockPreset(@root/mockPreset)
 
 ```jsx
 const { default: List } = _Task;
 const { createWithRemoteLoader } = remoteLoader;
+const { default: mockPreset } = _mockPreset;
 const BaseExample = createWithRemoteLoader({
   modules: ['components-core:Global@PureGlobal', 'components-core:Global@usePreset', 'components-core:Layout']
 })(({ remoteModules }) => {
@@ -25,43 +26,7 @@ const BaseExample = createWithRemoteLoader({
   const { ajax } = usePreset();
   return (
     <PureGlobal
-      preset={{
-        ajax,
-        apis: {
-          testApi: {
-            getList: {
-              loader: () => {
-                return {
-                  pageData: [
-                    {
-                      id: 1,
-                      name: '测试数据',
-                      description: '测试测试测试测试测试测试测试',
-                      createdTime: new Date()
-                    }
-                  ],
-                  totalCount: 1
-                };
-              }
-            },
-            add: {
-              loader: () => {
-                return null;
-              }
-            },
-            save: {
-              loader: () => {
-                return null;
-              }
-            },
-            remove: {
-              loader: () => {
-                return null;
-              }
-            }
-          }
-        }
-      }}
+      preset={mockPreset}
     >
       <Layout navigation={{ isFixed: false }}>
         <List />
@@ -74,96 +39,21 @@ render(<BaseExample />);
 
 ```
 
-- 表单页
-- 表单页
-- remoteLoader(@kne/remote-loader),_Task(@components/Task)
-
-```jsx
-const { FormInner } = _Task;
-const { createWithRemoteLoader } = remoteLoader;
-const BaseExample = createWithRemoteLoader({
-  modules: ['components-core:FormInfo@Form']
-})(({ remoteModules }) => {
-  const [Form] = remoteModules;
-  return (
-    <Form>
-      <FormInner />
-    </Form>
-  );
-});
-
-render(<BaseExample />);
-
-```
-
-- 详情页
-- 详情页
-- remoteLoader(@kne/remote-loader),_Task(@components/Task)
-
-```jsx
-const { Detail } = _Task;
-const { createWithRemoteLoader } = remoteLoader;
-const BaseExample = createWithRemoteLoader({
-  modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
-})(({ remoteModules }) => {
-  const [PureGlobal, Layout] = remoteModules;
-  return (
-    <PureGlobal
-      preset={{
-        apis: {
-          testApi: {
-            getDetail: {
-              loader: () => {
-                return {
-                  id: '1212121212',
-                  name: '测试测试测试',
-                  description: '描述描述描述描述描述描述描述描述'
-                };
-              }
-            }
-          }
-        }
-      }}
-    >
-      <Layout navigation={{ isFixed: false }}>
-        <Detail optionFixed={false} />
-      </Layout>
-    </PureGlobal>
-  );
-});
-
-render(<BaseExample />);
-
-```
-
 - tab详情页
 - tab详情页
-- remoteLoader(@kne/remote-loader),_Task(@components/Task)
+- remoteLoader(@kne/remote-loader),_Task(@components/Task),_mockPreset(@root/mockPreset)
 
 ```jsx
 const { TabDetail } = _Task;
 const { createWithRemoteLoader } = remoteLoader;
+const { default: mockPreset } = _mockPreset;
 const BaseExample = createWithRemoteLoader({
   modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
 })(({ remoteModules }) => {
   const [PureGlobal, Layout] = remoteModules;
   return (
     <PureGlobal
-      preset={{
-        apis: {
-          testApi: {
-            getDetail: {
-              loader: () => {
-                return {
-                  id: '1212121212',
-                  name: '测试测试测试',
-                  description: '描述描述描述描述描述描述描述描述'
-                };
-              }
-            }
-          }
-        }
-      }}
+      preset={mockPreset}
     >
       <Layout navigation={{ isFixed: false }}>
         <TabDetail optionFixed={false} />
