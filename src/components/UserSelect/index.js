@@ -22,6 +22,7 @@ const UserSelect = createWithRemoteLoader({
           return Object.assign({}, data, {
             pageData: (data.pageData || []).map(item =>
               Object.assign({}, item, {
+                value: item.id,
                 label: item.nickname || item.email || item.phone
               })
             )

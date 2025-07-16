@@ -13,6 +13,10 @@
         {
           "name": "_Project",
           "packageName": "@components/Project"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
         }
       ]
     },
@@ -28,21 +32,10 @@
         {
           "name": "_Project",
           "packageName": "@components/Project"
-        }
-      ]
-    },
-    {
-      "title": "详情页",
-      "description": "详情页",
-      "code": "./detail.js",
-      "scope": [
-        {
-          "name": "remoteLoader",
-          "packageName": "@kne/remote-loader"
         },
         {
-          "name": "_Project",
-          "packageName": "@components/Project"
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
         }
       ]
     },
@@ -58,6 +51,10 @@
         {
           "name": "_Project",
           "packageName": "@components/Project"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
         }
       ]
     }

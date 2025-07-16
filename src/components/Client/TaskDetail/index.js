@@ -284,7 +284,7 @@ const CaseList = createWithRemoteLoader({
 
 const TaskDetail = createWithRemoteLoader({
   modules: ['components-core:Layout@StateBarPage']
-})(({ remoteModules, menu }) => {
+})(({ remoteModules, ...props }) => {
   const [StateBarPage] = remoteModules;
   const { id } = useParams();
   const [searchParams] = useSearchParams();
@@ -292,7 +292,7 @@ const TaskDetail = createWithRemoteLoader({
   const [activeKey, setActiveKey] = useState('detail');
   return (
     <StateBarPage
-      menu={menu}
+      {...props}
       title="任务详情"
       backUrl="/task"
       page={{}}

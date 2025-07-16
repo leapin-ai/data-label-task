@@ -1,0 +1,40 @@
+{
+  "code": 0,
+  "data": {
+    "pageData": [
+      {
+        "id": "194040281090229248",
+        "userAccountId": "194040281073452032",
+        "nickname": null,
+        "email": "a@a.com",
+        "phone": null,
+        "status": 0,
+        "avatar": null,
+        "gender": null,
+        "birthday": null,
+        "description": null,
+        "isSuperAdmin": true,
+        "createdAt": "2025-06-19T10:46:48.106Z",
+        "updatedAt": "2025-06-19T10:47:02.736Z",
+        "deletedAt": null
+      },
+      {
+        "id": "194267257898009600",
+        "userAccountId": "194267314420450304",
+        "nickname": "test",
+        "email": "a@b.com",
+        "phone": null,
+        "status": 12,
+        "avatar": null,
+        "gender": null,
+        "birthday": null,
+        "description": null,
+        "isSuperAdmin": null,
+        "createdAt": "2025-06-20T01:48:43.594Z",
+        "updatedAt": "2025-06-26T07:37:38.529Z",
+        "deletedAt": null
+      }
+    ],
+    "totalCount": 2
+  }
+}

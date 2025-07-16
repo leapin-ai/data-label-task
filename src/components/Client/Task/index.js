@@ -7,7 +7,7 @@ import style from './style.module.scss';
 
 const Task = createWithRemoteLoader({
   modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:Enum', 'components-core:StateTag', 'components-core:StateBar']
-})(({ remoteModules, menu }) => {
+})(({ remoteModules, ...props }) => {
   const [TablePage, usePreset, Enum, StateTag, StateBar] = remoteModules;
   const { apis } = usePreset();
   const ref = useRef();
@@ -59,7 +59,7 @@ const Task = createWithRemoteLoader({
       ref={ref}
       name="client-task"
       page={{
-        menu,
+        ...props,
         title: (
           <Enum moduleName="taskStatus">
             {list => {

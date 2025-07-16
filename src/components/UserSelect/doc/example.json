@@ -9,6 +9,14 @@
         {
           "name": "_UserSelect",
           "packageName": "@components/UserSelect"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
         }
       ]
     }

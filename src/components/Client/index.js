@@ -3,11 +3,10 @@ import { Routes, Route } from 'react-router-dom';
 import Task from './Task';
 import Home from './Home';
 import TaskDetail from './TaskDetail';
-import style from './style.module.scss';
 
 const Client = createWithRemoteLoader({
   modules: ['components-core:Menu']
-})(({ remoteModules }) => {
+})(({ remoteModules, ...props }) => {
   const [Menu] = remoteModules;
   const menu = (
     <Menu
@@ -19,9 +18,9 @@ const Client = createWithRemoteLoader({
   );
   return (
     <Routes>
-      <Route index element={<Home menu={menu} />} />
-      <Route path="/task/:id" element={<TaskDetail menu={menu} />} />
-      <Route path="/task" element={<Task menu={menu} />} />
+      <Route index element={<Home {...props} menu={menu} />} />
+      <Route path="/task/:id" element={<TaskDetail {...props} menu={menu} />} />
+      <Route path="/task" element={<Task {...props} menu={menu} />} />
     </Routes>
   );
 });
