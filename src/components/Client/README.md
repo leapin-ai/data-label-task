@@ -26,8 +26,8 @@ const BaseExample = createWithRemoteLoader({
 
   return (
     <PureGlobal preset={mockPreset}>
-      <Layout  navigation={{ isFixed: false }}>
-        <Client menuFixed={false}/>
+      <Layout navigation={{ isFixed: false }}>
+        <Client menuFixed={false} />
       </Layout>
     </PureGlobal>
   );

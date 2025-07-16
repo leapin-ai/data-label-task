@@ -25,9 +25,7 @@ const BaseExample = createWithRemoteLoader({
   const [PureGlobal, usePreset, Layout] = remoteModules;
   const { ajax } = usePreset();
   return (
-    <PureGlobal
-      preset={mockPreset}
-    >
+    <PureGlobal preset={mockPreset}>
       <Layout navigation={{ isFixed: false }}>
         <List />
       </Layout>
@@ -52,9 +50,7 @@ const BaseExample = createWithRemoteLoader({
 })(({ remoteModules }) => {
   const [PureGlobal, Layout] = remoteModules;
   return (
-    <PureGlobal
-      preset={mockPreset}
-    >
+    <PureGlobal preset={mockPreset}>
       <Layout navigation={{ isFixed: false }}>
         <TabDetail optionFixed={false} />
       </Layout>
