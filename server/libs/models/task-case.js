@@ -30,8 +30,7 @@ module.exports = ({ DataTypes, options }) => {
       taskCase.belongsTo(dataSource);
       taskCase.belongsTo(options.getUserModel(), {
         foreignKey: 'allocatorUserId',
-        comment: '任务分配人',
-        allowNull: false
+        comment: '任务分配人'
       });
     },
     options: {

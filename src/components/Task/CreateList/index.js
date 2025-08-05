@@ -34,9 +34,10 @@ const CreateList = createWithRemoteLoader({
         fixed: 'right',
         valueOf: item => {
           return {
-            children: props => (
+            children: ({ buttonProps, more }) => (
               <Actions
-                {...props}
+                {...buttonProps}
+                more={more}
                 data={item}
                 list={[
                   {

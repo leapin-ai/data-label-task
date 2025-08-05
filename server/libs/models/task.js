@@ -24,7 +24,7 @@ module.exports = ({ DataTypes, options }) => {
         defaultValue: []
       }
     },
-    associate: ({ task, project }) => {
+    associate: ({ task, project, taskCase }) => {
       task.belongsTo(options.getUserModel(), {
         foreignKey: 'createdUserId',
         as: 'createdUser',
@@ -34,10 +34,10 @@ module.exports = ({ DataTypes, options }) => {
       task.belongsTo(options.getUserModel(), {
         foreignKey: 'allocatorUserId',
         as: 'allocatorUser',
-        comment: '任务分配人',
-        allowNull: false
+        comment: '任务分配人'
       });
       task.belongsTo(project);
+      task.hasMany(taskCase);
     },
     options: {
       comment: '任务'
