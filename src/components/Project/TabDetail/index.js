@@ -36,6 +36,7 @@ const TabDetail = createWithRemoteLoader({
                 { tab: '任务', key: 'task', disabled: data.status !== 'open' }
               ]
             }}
+            headerFixed={false}
             header={<PageHeader title={data.name} info={`ID: ${data.id}`} tags={[data.status === 'open' ? <StateTag type="success" text="进行中" /> : <StateTag type="text" text="待开启" />]} />}
           >
             <ContentComponent data={data} />

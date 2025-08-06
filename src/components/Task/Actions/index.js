@@ -7,6 +7,7 @@ import Confirmed from './Confirmed';
 import Closed from './Closed';
 import Allocator from './Allocator';
 import Copy from './Copy';
+import ExportResult from './ExportResult';
 
 const actionMap = {
   pending: Reset,
@@ -15,7 +16,8 @@ const actionMap = {
   confirmed: Confirmed,
   allocator: Allocator,
   closed: Closed,
-  copy: Copy
+  copy: Copy,
+  exportResult: ExportResult
 };
 
 const Actions = createWithRemoteLoader({
@@ -25,8 +27,8 @@ const Actions = createWithRemoteLoader({
   const statusTransitions = {
     pending: ['inProgress', 'allocator', 'copy', 'closed'],
     inProgress: ['completed', 'copy', 'closed'],
-    completed: ['confirmed', 'copy', 'closed'],
-    confirmed: ['copy', 'closed'],
+    completed: ['exportResult', 'confirmed', 'copy', 'closed'],
+    confirmed: ['exportResult', 'copy', 'closed'],
     closed: ['pending', 'copy']
   };
 

@@ -78,6 +78,10 @@ const getApis = options => {
       copy: {
         url: `${prefix}/task/copy`,
         method: 'POST'
+      },
+      exportResult: {
+        url: `${prefix}/task/export-result`,
+        method: 'GET'
       }
     },
     client: {

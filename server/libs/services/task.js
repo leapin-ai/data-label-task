@@ -342,14 +342,45 @@ module.exports = fp(async (fastify, options) => {
       }
     });
 
+    if (task.length === 0) {
+      throw new Error('没有包含任何已完成或已确认的任务');
+    }
+
     const generator = async t => {
       const workbook = new exceljs.Workbook();
+      const taskCaseWorksheet = workbook.addWorksheet('标注数据');
+
+      taskCaseWorksheet.columns = t.project.fields.map(({ name, label }) => {
+        return {
+          header: label,
+          key: name,
+          width: 40
+        };
+      });
+
+      t.taskCases.forEach(({ result, dataSource }) => {
+        taskCaseWorksheet.addRow(
+          transform(
+            t.project.fields,
+            (target, value) => {
+              const { name, needAnnotate } = value;
+              if (needAnnotate) {
+                target[name] = result[name];
+              } else {
+                target[name] = dataSource?.data?.[name];
+              }
+            },
+            {}
+          )
+        );
+      });
+
       const worksheet = workbook.addWorksheet('任务信息');
       worksheet.columns = [
-        { header: '任务ID', key: 'id', width: 10 },
-        { header: '任务名称', key: 'name', width: 20 },
+        { header: '任务ID', key: 'id', width: 20 },
+        { header: '任务名称', key: 'name', width: 30 },
         { header: '任务描述', key: 'description', width: 40 },
-        { header: '项目名称', key: 'projectName', width: 20 },
+        { header: '项目名称', key: 'projectName', width: 30 },
         { header: '状态', key: 'status', width: 15 },
         { header: '完成时间', key: 'completeTime', width: 20 }
       ];
@@ -363,32 +394,6 @@ module.exports = fp(async (fastify, options) => {
         completeTime: t.completeTime
       });
 
-      const taskCaseWorksheet = workbook.addWorksheet('标注数据');
-
-      taskCaseWorksheet.columns = t.project.fields.map(({ name, label }) => {
-        return {
-          header: label,
-          key: name
-        };
-      });
-
-      t.taskCases.forEach(({ result, dataSource }) => {
-        taskCaseWorksheet.addRow(
-          transform(
-            t.project.fields,
-            (target, value) => {
-              const { name, needAnnotate } = value;
-              if (needAnnotate) {
-                target[name] = result[name];
-              } else {
-                target[name] = dataSource[name];
-              }
-            },
-            {}
-          )
-        );
-      });
-
       return {
         file: await workbook.xlsx.writeBuffer(),
         filename: `${t.id}-${t.name}-${t.project.name}.xlsx`
@@ -398,8 +403,8 @@ module.exports = fp(async (fastify, options) => {
     if (task.length > 1) {
       const zip = new JSZip();
       for (const t of task) {
-        const { file, name } = await generator(t);
-        zip.file(name, file);
+        const { file, filename } = await generator(t);
+        zip.file(filename, file);
       }
       return {
         file: await zip.generateAsync({ type: 'nodebuffer' }),

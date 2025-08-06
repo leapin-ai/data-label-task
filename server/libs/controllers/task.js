@@ -155,7 +155,7 @@ module.exports = fp(async (fastify, options) => {
     },
     async (request, reply) => {
       const { file, filename } = await services.task.exportResult(request.userInfo, request.query);
-      reply.header('Content-Disposition', `attachment; filename=${filename}`);
+      reply.header('Content-Disposition', `attachment; filename=${encodeURIComponent(filename)}`);
       reply.type('application/octet-stream');
       reply.send(file);
     }

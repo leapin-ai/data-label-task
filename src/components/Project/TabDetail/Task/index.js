@@ -1,15 +1,18 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Flex, Button, Alert, message } from 'antd';
 import UserSelect from '@components/UserSelect';
-import { useRef } from 'react';
-import getColumns from './getColumns';
+import { useRef, useState } from 'react';
+import qs from 'qs';
 import { CreateList } from '@components/Task';
+import uniq from 'lodash/uniq';
+import { getToken } from '@kne/token-storage';
 
 const Task = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset', 'components-core:Table@TablePage', 'components-core:FormInfo', 'components-ckeditor:Editor', 'components-core:Enum', 'components-core:StateTag']
+  modules: ['components-core:Global@usePreset', 'components-core:Table@TablePage', 'components-core:FormInfo', 'components-ckeditor:Editor', 'components-core:File@Download']
 })(({ remoteModules, data }) => {
-  const [usePreset, TablePage, FormInfo, Editor, Enum, StateTag] = remoteModules;
+  const [usePreset, TablePage, FormInfo, Editor, Download] = remoteModules;
   const { apis, ajax } = usePreset();
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const { useFormModal } = FormInfo;
   const formModal = useFormModal();
   const ref = useRef();
@@ -17,7 +20,7 @@ const Task = createWithRemoteLoader({
   return (
     <Flex vertical gap={8} flex={1}>
       <Flex justify="space-between">
-        <div></div>
+        {selectedRowKeys.length > 0 ? <div>已选择: {selectedRowKeys.length}条数据源</div> : <div>&nbsp;</div>}
         <Flex gap={8}>
           <Button
             type="primary"
@@ -94,6 +97,9 @@ const Task = createWithRemoteLoader({
           >
             批量生成任务
           </Button>
+          <Download disabled={selectedRowKeys.length === 0} size="small" src={`${apis.task.exportResult.url}?token=${getToken('X-User-Token')}&${qs.stringify({ ids: selectedRowKeys })}`}>
+            导出
+          </Download>
         </Flex>
       </Flex>
       <CreateList
@@ -108,6 +114,39 @@ const Task = createWithRemoteLoader({
                 params: { projectId: data.id }
               })}
               {...props}
+              rowSelection={{
+                type: 'checkbox',
+                selectedRowKeys,
+                onSelectAll: (type, selected, items) => {
+                  const ids = items.map(({ id }) => id);
+                  if (type) {
+                    setSelectedRowKeys(value => {
+                      return uniq([...value, ...ids]);
+                    });
+                  } else {
+                    setSelectedRowKeys(value => {
+                      return value.filter(item => {
+                        return ids.indexOf(item) === -1;
+                      });
+                    });
+                  }
+                },
+                onSelect: (item, type) => {
+                  if (type) {
+                    setSelectedRowKeys(value => {
+                      const newValue = value.slice(0);
+                      newValue.push(item.id);
+                      return newValue;
+                    });
+                  } else {
+                    setSelectedRowKeys(value => {
+                      const newValue = value.slice(0);
+                      newValue.splice(newValue.indexOf(item.id), 1);
+                      return newValue;
+                    });
+                  }
+                }
+              }}
               name="project-task-list"
               pagination={{ paramsType: 'params' }}
               ref={ref}
