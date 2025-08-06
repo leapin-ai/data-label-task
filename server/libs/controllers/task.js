@@ -14,7 +14,7 @@ module.exports = fp(async (fastify, options) => {
       allocatorUserId: { type: 'string' },
       projectId: { type: 'string' }
     },
-    required: ['name', 'completeTime', 'allocatorUserId', 'projectId']
+    required: ['name', 'completeTime', 'projectId']
   };
 
   fastify.post(
@@ -63,6 +63,101 @@ module.exports = fp(async (fastify, options) => {
     },
     async request => {
       return services.task.list(request.query);
+    }
+  );
+
+  fastify.post(
+    `${options.prefix}/task/allocator`,
+    {
+      onRequest: [userAuthenticate, adminAuthenticate],
+      schema: {
+        summary: '任务指派',
+        body: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            allocatorUserId: { type: 'string' }
+          },
+          required: ['id', 'allocatorUserId']
+        }
+      }
+    },
+    async request => {
+      await services.task.allocator(request.userInfo, request.body);
+      return {};
+    }
+  );
+
+  fastify.post(
+    `${options.prefix}/task/split`,
+    {
+      onRequest: [userAuthenticate, adminAuthenticate],
+      schema: {
+        summary: '任务拆分',
+        body: {
+          type: 'object',
+          properties: {
+            projectId: { type: 'string' },
+            name: { type: 'string' },
+            description: { type: 'string' },
+            completeTime: { type: 'string', format: 'date-time' },
+            count: { type: 'number', default: 200 }
+          },
+          required: ['projectId', 'name', 'completeTime']
+        }
+      }
+    },
+    async request => {
+      await services.task.split(request.userInfo, request.body);
+      return {};
+    }
+  );
+
+  fastify.post(
+    `${options.prefix}/task/copy`,
+    {
+      onRequest: [userAuthenticate, adminAuthenticate],
+      schema: {
+        summary: '任务复制',
+        body: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' }
+          },
+          required: ['id']
+        }
+      }
+    },
+    async request => {
+      await services.task.copy(request.userInfo, request.body);
+      return {};
+    }
+  );
+
+  fastify.get(
+    `${options.prefix}/task/export-result`,
+    {
+      onRequest: [userAuthenticate, adminAuthenticate],
+      schema: {
+        summary: '导出任务结果',
+        query: {
+          type: 'object',
+          properties: {
+            ids: {
+              type: 'array',
+              items: {
+                type: 'string'
+              }
+            }
+          }
+        }
+      }
+    },
+    async (request, reply) => {
+      const { file, filename } = await services.task.exportResult(request.userInfo, request.query);
+      reply.header('Content-Disposition', `attachment; filename=${encodeURIComponent(filename)}`);
+      reply.type('application/octet-stream');
+      reply.send(file);
     }
   );
 

@@ -1,7 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useRef, useState } from 'react';
 import { Space, Button, App } from 'antd';
-import FormInner from '../FormInner';
 import CreateList from '../CreateList';
 
 const List = createWithRemoteLoader({

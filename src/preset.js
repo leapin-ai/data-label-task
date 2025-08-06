@@ -79,8 +79,10 @@ export const globalInit = async () => {
 
   const componentsCoreRemote = {
     ...registry,
+    //url: 'http://localhost:3001',
+    //tpl: '{{url}}',
     remote: 'components-core',
-    defaultVersion: '0.3.28'
+    defaultVersion: '0.4.11'
   };
   remoteLoaderPreset({
     remotes: {
@@ -106,7 +108,7 @@ export const globalInit = async () => {
         //url: 'http://localhost:3016',
         //tpl: '{{url}}',
         remote: 'components-admin',
-        defaultVersion: '1.0.6'
+        defaultVersion: '1.0.10'
       },
       'data-label-task':
         process.env.NODE_ENV === 'development'
