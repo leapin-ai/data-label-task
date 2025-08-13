@@ -296,7 +296,8 @@ const CaseList = createWithRemoteLoader({
         const columns = data.task.project.fields.map(({ name, label }) => {
           return {
             name: name,
-            title: label
+            title: label,
+            ellipsis: true
           };
         });
         return (
@@ -337,6 +338,13 @@ const CaseList = createWithRemoteLoader({
               }
             }}
             columns={[
+              {
+                name: 'id',
+                title: 'ID',
+                type: 'serialNumber',
+                primary: false,
+                hover: false
+              },
               ...columns,
               {
                 name: 'isCompleted',

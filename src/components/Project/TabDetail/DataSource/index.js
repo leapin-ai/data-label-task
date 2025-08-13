@@ -84,7 +84,8 @@ const DataSource = createWithRemoteLoader({
           ...data.fields.map(({ name, label }) => {
             return {
               name: name,
-              title: label
+              title: label,
+              ellipsis: true
             };
           })
         ]}

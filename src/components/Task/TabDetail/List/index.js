@@ -188,7 +188,16 @@ const List = createWithRemoteLoader({
               }
             : false
         }
-        columns={columns}
+        columns={[
+          {
+            name: 'id',
+            title: 'ID',
+            type: 'serialNumber',
+            primary: false,
+            hover: false
+          },
+          ...columns
+        ]}
       />
     </Flex>
   );
