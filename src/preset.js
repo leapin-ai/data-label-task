@@ -103,6 +103,11 @@ export const globalInit = async () => {
         remote: 'components-file-manager',
         defaultVersion: '0.1.1'
       },
+      'components-document': {
+        ...registry,
+        remote: 'components-document',
+        defaultVersion: '0.1.6'
+      },
       'components-admin': {
         ...registry,
         //url: 'http://localhost:3016',

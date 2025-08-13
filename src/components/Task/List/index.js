@@ -1,20 +1,17 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useRef, useState } from 'react';
-import { Space, Button, App } from 'antd';
+import { Space } from 'antd';
 import CreateList from '../CreateList';
 
 const List = createWithRemoteLoader({
-  modules: ['components-core:Layout@TablePage', 'components-core:Filter', 'components-core:Global@usePreset', 'components-core:FormInfo@useFormModal', 'components-core:StateBar', 'components-core:Enum']
+  modules: ['components-core:Layout@TablePage', 'components-core:Filter', 'components-core:Global@usePreset', 'components-core:StateBar', 'components-core:Enum']
 })(({ remoteModules }) => {
-  const [TablePage, Filter, usePreset, useFormModal, StateBar, Enum] = remoteModules;
-  const { ajax, apis } = usePreset();
-  const { SearchInput, getFilterValue, fields: filterFields } = Filter;
-  const { InputFilterItem } = filterFields;
+  const [TablePage, Filter, usePreset, StateBar, Enum] = remoteModules;
+  const { apis } = usePreset();
+  const { SearchInput, getFilterValue } = Filter;
   const ref = useRef(null);
   const [filter, setFilter] = useState([]);
   const filterValue = getFilterValue(filter);
-  const formModal = useFormModal();
-  const { message } = App.useApp();
 
   return (
     <Enum moduleName="taskStatus">
