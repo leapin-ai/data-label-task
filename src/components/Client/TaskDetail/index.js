@@ -1,8 +1,9 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useState, useRef } from 'react';
 import Fetch from '@kne/react-fetch';
 import { Button, Flex, Empty } from 'antd';
+import { CheckCircleFilled, ClockCircleFilled } from '@ant-design/icons';
 import Lottie from '@components/Lottie';
 import localStorage from '@kne/local-storage';
 import style from '../style.module.scss';
@@ -28,6 +29,7 @@ const CaseDetail = createWithRemoteLoader({
   const currentRef = useRef();
   const modal = useModal();
   const [expand, setExpand] = useState(localStorage.getItem('expand'));
+  const [searchParams, setSearchParams] = useSearchParams();
   return (
     <Fetch
       {...Object.assign({}, apis.client.taskCase.detail, {
@@ -72,7 +74,11 @@ const CaseDetail = createWithRemoteLoader({
               <LoadingButton
                 type="primary"
                 onClick={async () => {
-                  await refresh({ force: true });
+                  setSearchParams(searchParams => {
+                    const newSearchParams = new URLSearchParams(searchParams);
+                    newSearchParams.delete('taskCaseId');
+                    return newSearchParams;
+                  });
                 }}
               >
                 重新获取
@@ -81,6 +87,12 @@ const CaseDetail = createWithRemoteLoader({
           );
         }
         currentTaskCaseIdRef.current = data.taskCase.id;
+        searchParams.get('taskCaseId') !== data.taskCase?.id &&
+          setSearchParams(searchParams => {
+            const newSearchParams = new URLSearchParams(searchParams);
+            data.taskCase?.id ? newSearchParams.set('taskCaseId', data.taskCase.id) : newSearchParams.delete('taskCaseId');
+            return newSearchParams;
+          });
         return (
           <div ref={currentRef}>
             <InfoPage>
@@ -276,10 +288,11 @@ const CaseList = createWithRemoteLoader({
 })(({ remoteModules, id }) => {
   const [usePreset, TablePage] = remoteModules;
   const { apis } = usePreset();
+  const navigate = useNavigate();
   return (
     <Fetch
       {...Object.assign({}, apis.client.taskCase.list, { params: { id } })}
-      render={({ data }) => {
+      render={({ data, reload }) => {
         const columns = data.task.project.fields.map(({ name, label }) => {
           return {
             name: name,
@@ -312,6 +325,17 @@ const CaseList = createWithRemoteLoader({
                 }
               }
             )}
+            pagination={{
+              paramsType: 'params',
+              onChange: (page, size) => {
+                reload({
+                  params: {
+                    currentPage: page,
+                    perPage: size
+                  }
+                });
+              }
+            }}
             columns={[
               ...columns,
               {
@@ -319,7 +343,15 @@ const CaseList = createWithRemoteLoader({
                 title: '是否完成',
                 type: 'otherSmall',
                 valueOf: item => {
-                  return item.isCompleted ? '已完成' : '未完成';
+                  return item.isCompleted ? (
+                    <Flex style={{ color: 'var(--color-success)' }}>
+                      <CheckCircleFilled />
+                    </Flex>
+                  ) : (
+                    <Flex style={{ color: 'var(--font-color-grey-3)' }}>
+                      <ClockCircleFilled />
+                    </Flex>
+                  );
                 }
               },
               {
@@ -330,6 +362,22 @@ const CaseList = createWithRemoteLoader({
                   if (!startTime || !completeTime) return;
                   const diff = (new Date(completeTime) - new Date(startTime)) / 1000;
                   return `${diff.toFixed(2)}s`;
+                }
+              },
+              {
+                name: 'options',
+                title: '操作',
+                type: 'options',
+                fixed: 'right',
+                valueOf: item => {
+                  return [
+                    {
+                      children: '任务详情',
+                      onClick: () => {
+                        navigate(`/task/${id}?taskCaseId=${item.id}&tab=detail`);
+                      }
+                    }
+                  ];
                 }
               }
             ]}
@@ -345,9 +393,9 @@ const TaskDetail = createWithRemoteLoader({
 })(({ remoteModules, ...props }) => {
   const [StateBarPage] = remoteModules;
   const { id } = useParams();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const taskCaseId = searchParams.get('taskCaseId');
-  const [activeKey, setActiveKey] = useState('detail');
+  const activeKey = searchParams.get('tab') || 'detail';
   return (
     <StateBarPage
       {...props}
@@ -356,7 +404,13 @@ const TaskDetail = createWithRemoteLoader({
       page={{}}
       stateBar={{
         activeKey,
-        onChange: setActiveKey,
+        onChange: name => {
+          setSearchParams(searchParams => {
+            const newSearchParams = new URLSearchParams(searchParams);
+            newSearchParams.set('tab', name);
+            return newSearchParams;
+          });
+        },
         stateOption: [
           { tab: '当前任务项', key: 'detail' },
           { tab: '任务项列表', key: 'list' }
