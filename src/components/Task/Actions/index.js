@@ -26,7 +26,7 @@ const Actions = createWithRemoteLoader({
   const [ButtonGroup] = remoteModules;
   const statusTransitions = {
     pending: ['inProgress', 'allocator', 'copy', 'closed'],
-    inProgress: ['completed', 'copy', 'closed'],
+    inProgress: ['copy', 'closed'],
     completed: ['exportResult', 'confirmed', 'copy', 'closed'],
     confirmed: ['exportResult', 'copy', 'closed'],
     closed: ['pending', 'copy']
