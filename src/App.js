@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import pages from './pages';
 import './index.scss';
 
-const { Account, Admin, InitAdmin, Error, NotFound } = pages;
+const { Client, Account, Admin, InitAdmin, Error, NotFound } = pages;
 
 const App = createWithRemoteLoader({
   modules: ['components-core:Global', 'components-admin:Authenticate@BeforeLoginLayout', 'components-admin:Authenticate@AfterUserLoginLayout', 'components-admin:Authenticate@AfterAdminUserLoginLayout']
@@ -72,7 +72,7 @@ const App = createWithRemoteLoader({
             />
           }
         >
-          <Route path="*" element={<RemoteLoader key="client" module="data-label-task:Client" />} />
+          <Route path="*" element={<Client />} />
         </Route>
         <Route element={<BeforeLoginLayout />}>
           <Route path="error" element={<Error />} />
