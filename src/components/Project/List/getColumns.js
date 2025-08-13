@@ -2,16 +2,19 @@ const getColumns = () => {
   return [
     {
       name: 'id',
-      title: '编号',
+      title: 'ID',
       type: 'serialNumber',
-      primary: true,
-      hover: true,
+      primary: false,
+      hover: false,
       onClick: () => {}
     },
     {
       name: 'name',
       title: '名称',
-      type: 'mainInfo'
+      type: 'mainInfo',
+      primary: false,
+      hover: false,
+      ellipsis: true
     },
     {
       name: 'status',
@@ -27,7 +30,8 @@ const getColumns = () => {
     {
       name: 'description',
       title: '描述',
-      type: 'description'
+      type: 'description',
+      ellipsis: true
     },
     {
       name: 'createdAt',
