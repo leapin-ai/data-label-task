@@ -331,6 +331,7 @@ const CaseList = createWithRemoteLoader({
                 }
               }
             )}
+            params={params}
             data={data}
             pagination={{
               paramsType: 'params',
