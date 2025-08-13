@@ -43,6 +43,10 @@ const getApis = options => {
         url: `${prefix}/task/create`,
         method: 'POST'
       },
+      save: {
+        url: `${prefix}/task/save`,
+        method: 'POST'
+      },
       list: {
         url: `${prefix}/task/list`,
         method: 'GET'

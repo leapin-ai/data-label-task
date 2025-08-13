@@ -186,6 +186,32 @@ export const globalInit = async () => {
       },
       getApis()
     ),
+    formInfo: {
+      rules: {
+        NUM_VALUE: (value, start, end) => {
+          value = Number(value);
+          if (end === start && value !== Number(end)) {
+            return {
+              result: false,
+              errMsg: `%s必须等于${end}`
+            };
+          }
+          if (value < start) {
+            return {
+              result: false,
+              errMsg: `%s必须大于等于${start}`
+            };
+          }
+          if (end && value > end) {
+            return {
+              result: false,
+              errMsg: `%s必须小于等于${end}`
+            };
+          }
+          return { result: true };
+        }
+      }
+    },
     themeToken: {
       colorPrimary: '#4183F0'
     }

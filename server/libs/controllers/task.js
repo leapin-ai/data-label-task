@@ -1,4 +1,5 @@
 const fp = require('fastify-plugin');
+const merge = require('lodash/merge');
 
 module.exports = fp(async (fastify, options) => {
   const { services } = fastify[options.name];
@@ -29,6 +30,26 @@ module.exports = fp(async (fastify, options) => {
     },
     async request => {
       return services.task.create(request.userInfo, request.body);
+    }
+  );
+
+  fastify.post(
+    `${options.prefix}/task/save`,
+    {
+      onRequest: [userAuthenticate, adminAuthenticate],
+      schema: {
+        description: '保存任务',
+        summary: '保存任务',
+        body: merge({}, taskSchema, {
+          properties: {
+            id: { type: 'string' }
+          },
+          required: ['id']
+        })
+      }
+    },
+    async request => {
+      return services.task.save(request.userInfo, request.body);
     }
   );
 

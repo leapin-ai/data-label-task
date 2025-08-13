@@ -13,6 +13,12 @@ module.exports = fp(async (fastify, options) => {
     }
     const { rows, count } = await models.task.findAndCountAll({
       attributes: ['id', 'name', 'completeTime', 'description', 'status', 'tracking'],
+      include: {
+        model: models.project,
+        where: {
+          status: 'open'
+        }
+      },
       where: {
         ...whereQuery,
         allocatorUserId: userId
@@ -155,7 +161,8 @@ module.exports = fp(async (fastify, options) => {
         taskId: task.id
       }),
       offset: perPage * (currentPage - 1),
-      limit: perPage
+      limit: perPage,
+      order: [['id', 'ASC']]
     });
 
     return {
