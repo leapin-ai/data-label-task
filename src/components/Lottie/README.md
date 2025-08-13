@@ -16,9 +16,9 @@
 - _Lottie(@components/Lottie)
 
 ```jsx
-const {default:Lottie} = _Lottie;
-const BaseExample = ()=>{
-    return <Lottie />;
+const { default: Lottie } = _Lottie;
+const BaseExample = () => {
+  return <Lottie />;
 };
 
 render(<BaseExample />);
