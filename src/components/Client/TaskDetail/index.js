@@ -345,7 +345,6 @@ const CaseList = createWithRemoteLoader({
                 primary: false,
                 hover: false
               },
-              ...columns,
               {
                 name: 'isCompleted',
                 title: '是否完成',
@@ -372,6 +371,7 @@ const CaseList = createWithRemoteLoader({
                   return `${diff.toFixed(2)}s`;
                 }
               },
+              ...columns,
               {
                 name: 'options',
                 title: '操作',
