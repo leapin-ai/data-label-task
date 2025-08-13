@@ -310,7 +310,7 @@ const CaseList = createWithRemoteLoader({
             {...Object.assign(
               {},
               {
-                loader: () => data,
+                loader: ({ data }) => data,
                 transformData: data => {
                   return Object.assign({}, data, {
                     pageData: data.pageData.map(item => {
@@ -331,7 +331,7 @@ const CaseList = createWithRemoteLoader({
                 }
               }
             )}
-            params={params}
+            data={data}
             pagination={{
               paramsType: 'params',
               onChange: (page, size) => {
