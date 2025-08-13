@@ -7,6 +7,7 @@ import Closed from './Closed';
 import Allocator from './Allocator';
 import Copy from './Copy';
 import ExportResult from './ExportResult';
+import Edit from './Edit';
 
 const actionMap = {
   pending: Reset,
@@ -16,6 +17,7 @@ const actionMap = {
   allocator: Allocator,
   closed: Closed,
   copy: Copy,
+  edit: Edit,
   exportResult: ExportResult
 };
 
@@ -24,7 +26,7 @@ const Actions = createWithRemoteLoader({
 })(({ remoteModules, list = [], data, onSuccess, more, ...props }) => {
   const [ButtonGroup] = remoteModules;
   const statusTransitions = {
-    pending: ['inProgress', 'allocator', 'copy', 'closed'],
+    pending: ['edit', 'inProgress', 'allocator', 'copy', 'closed'],
     inProgress: ['copy', 'closed'],
     completed: ['exportResult', 'confirmed', 'copy', 'closed'],
     confirmed: ['exportResult', 'copy', 'closed'],
