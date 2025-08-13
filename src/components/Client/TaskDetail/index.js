@@ -289,10 +289,15 @@ const CaseList = createWithRemoteLoader({
   const [usePreset, TablePage] = remoteModules;
   const { apis } = usePreset();
   const navigate = useNavigate();
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    perPage: 20
+  });
+  const params = { id, ...pagination };
   return (
     <Fetch
-      {...Object.assign({}, apis.client.taskCase.list, { params: { id } })}
-      render={({ data, reload }) => {
+      {...Object.assign({}, apis.client.taskCase.list, { params })}
+      render={({ data }) => {
         const columns = data.task.project.fields.map(({ name, label }) => {
           return {
             name: name,
@@ -326,14 +331,13 @@ const CaseList = createWithRemoteLoader({
                 }
               }
             )}
+            params={params}
             pagination={{
               paramsType: 'params',
               onChange: (page, size) => {
-                reload({
-                  params: {
-                    currentPage: page,
-                    perPage: size
-                  }
+                setPagination({
+                  currentPage: page,
+                  perPage: size
                 });
               }
             }}
