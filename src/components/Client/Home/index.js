@@ -11,7 +11,7 @@ const Home = createWithRemoteLoader({
     <Page {...props}>
       <Flex vertical gap={24}>
         <Flex justify="center">
-          <Lottie path={`${window.PUBLIC_URL}/lottiefiles/data-label.json`} style={{ height: '300px' }} />
+          <Lottie path="/lottiefiles/data-label.json" style={{ height: '300px' }} />
         </Flex>
         <Flex
           style={{
