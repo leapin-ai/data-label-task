@@ -1,0 +1,38 @@
+{
+  "code": 0,
+  "data": {
+    "pageData": [
+      {
+        "id": "203775275404624896",
+        "name": "task",
+        "completeTime": "2025-07-16T16:00:00.000Z",
+        "description": "<p>xxxxxx</p>",
+        "status": "pending",
+        "tracking": [],
+        "createdAt": "2025-07-16T07:30:11.616Z",
+        "updatedAt": "2025-07-16T07:30:11.616Z",
+        "deletedAt": null,
+        "createdUserId": "194040281090229248",
+        "allocatorUserId": "194040281090229248",
+        "projectId": "194265605044438016",
+        "createdUser": {
+          "id": "194040281090229248",
+          "avatar": null,
+          "nickname": null,
+          "email": "a@a.com"
+        },
+        "allocatorUser": {
+          "id": "194040281090229248",
+          "avatar": null,
+          "nickname": null,
+          "email": "a@a.com"
+        },
+        "project": {
+          "id": "194265605044438016",
+          "name": "胜任力"
+        }
+      }
+    ],
+    "totalCount": 1
+  }
+}

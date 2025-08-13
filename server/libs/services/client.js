@@ -75,6 +75,7 @@ module.exports = fp(async (fastify, options) => {
             id: {
               [Op.gt]: taskCaseId
             },
+            taskId: task.id,
             isCompleted: false
           },
           order: [['id', 'ASC']]
@@ -87,6 +88,7 @@ module.exports = fp(async (fastify, options) => {
             id: {
               [Op.lt]: taskCaseId
             },
+            taskId: task.id,
             isCompleted: false
           }
         });

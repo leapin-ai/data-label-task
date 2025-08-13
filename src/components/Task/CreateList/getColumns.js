@@ -2,17 +2,20 @@ const getColumns = ({ renderRichText, renderTaskStatus, navigateTo }) => {
   return [
     {
       name: 'id',
-      title: '编号',
+      title: 'ID',
       type: 'serialNumber',
       fixed: 'left',
-      primary: true,
-      hover: true,
+      primary: false,
+      hover: false,
       onClick: () => {}
     },
     {
       name: 'name',
       title: '名称',
-      type: 'mainInfo'
+      type: 'mainInfo',
+      primary: false,
+      hover: false,
+      ellipsis: true
     },
     {
       name: 'status',
@@ -54,6 +57,7 @@ const getColumns = ({ renderRichText, renderTaskStatus, navigateTo }) => {
       name: 'description',
       title: '描述',
       type: 'description',
+      ellipsis: true,
       valueOf: item => renderRichText(item.description)
     },
     {

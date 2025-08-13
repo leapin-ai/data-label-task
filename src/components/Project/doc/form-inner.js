@@ -1,13 +1,16 @@
 const { FormInner } = _Project;
 const { createWithRemoteLoader } = remoteLoader;
+const { default: mockPreset } = _mockPreset;
 const BaseExample = createWithRemoteLoader({
-  modules: ['components-core:FormInfo@Form']
+  modules: ['components-core:FormInfo@Form', 'components-core:Global@PureGlobal']
 })(({ remoteModules }) => {
-  const [Form] = remoteModules;
+  const [Form, PureGlobal] = remoteModules;
   return (
-    <Form>
-      <FormInner />
-    </Form>
+    <PureGlobal preset={mockPreset}>
+      <Form>
+        <FormInner />
+      </Form>
+    </PureGlobal>
   );
 });
 

@@ -1,0 +1,11 @@
+.success-modal {
+  pointer-events: none;
+  transform: translateY(-100px);
+
+  :global {
+    .ant-modal-content {
+      background: transparent;
+      box-shadow: none;
+    }
+  }
+}

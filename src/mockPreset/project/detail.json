@@ -1,0 +1,38 @@
+{
+  "code": 0,
+  "data": {
+    "id": "194265605044438016",
+    "name": "胜任力",
+    "description": "先休息休息休息",
+    "fields": [
+      {
+        "name": "name",
+        "label": "名称",
+        "annotateType": "string",
+        "needAnnotate": false,
+        "needSearch": false
+      },
+      {
+        "name": "level",
+        "label": "等级",
+        "annotateType": "number",
+        "needAnnotate": true,
+        "annotateRule": "REQ",
+        "needSearch": false
+      },
+      {
+        "name": "desc",
+        "label": "说明",
+        "annotateType": "text",
+        "needAnnotate": true,
+        "annotateRule": "REQ",
+        "needSearch": false
+      }
+    ],
+    "status": "open",
+    "options": {},
+    "createdAt": "2025-06-20T01:42:09.518Z",
+    "updatedAt": "2025-06-20T01:42:21.226Z",
+    "deletedAt": null
+  }
+}

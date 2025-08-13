@@ -66,6 +66,22 @@ const getApis = options => {
       action: {
         url: `${prefix}/task/action`,
         method: 'POST'
+      },
+      allocator: {
+        url: `${prefix}/task/allocator`,
+        method: 'POST'
+      },
+      split: {
+        url: `${prefix}/task/split`,
+        method: 'POST'
+      },
+      copy: {
+        url: `${prefix}/task/copy`,
+        method: 'POST'
+      },
+      exportResult: {
+        url: `${prefix}/task/export-result`,
+        method: 'GET'
       }
     },
     client: {

@@ -9,6 +9,14 @@
         {
           "name": "_Client",
           "packageName": "@components/Client"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
         }
       ]
     }

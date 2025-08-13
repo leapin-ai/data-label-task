@@ -12,10 +12,13 @@ const List = createWithRemoteLoader({
   const ref = useRef(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [activeKey, setActiveKey] = useState(data.status !== 'pending' ? 'in' : 'all');
-  const columns = data.project.fields.map(({ name, label }) => {
+  const columns = data.project.fields.map(({ name, label, needAnnotate, annotateType }) => {
     return {
       name: name,
-      title: label
+      title: label,
+      valueOf: item => {
+        return needAnnotate ? item.taskCase?.result?.[name] : item[name];
+      }
     };
   });
   if (data.status === 'pending') {
@@ -35,7 +38,7 @@ const List = createWithRemoteLoader({
         title: '是否完成标注',
         type: 'tag',
         valueOf: item => {
-          return item.isCompleted
+          return item.taskCase?.isCompleted
             ? {
                 type: 'success',
                 text: '已完成'
@@ -185,7 +188,16 @@ const List = createWithRemoteLoader({
               }
             : false
         }
-        columns={columns}
+        columns={[
+          {
+            name: 'id',
+            title: 'ID',
+            type: 'serialNumber',
+            primary: false,
+            hover: false
+          },
+          ...columns
+        ]}
       />
     </Flex>
   );

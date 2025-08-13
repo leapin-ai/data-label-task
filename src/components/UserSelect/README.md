@@ -13,13 +13,24 @@
 
 - 这里填写示例标题
 - 这里填写示例说明
-- _UserSelect(@components/UserSelect)
+- _UserSelect(@components/UserSelect),remoteLoader(@kne/remote-loader),_mockPreset(@root/mockPreset)
 
 ```jsx
 const { default: UserSelect } = _UserSelect;
-const BaseExample = () => {
-  return <UserSelect />;
-};
+const { createWithRemoteLoader } = remoteLoader;
+const { default: mockPreset } = _mockPreset;
+const BaseExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal', 'components-core:FormInfo@Form']
+})(({ remoteModules }) => {
+  const [PureGlobal, Form] = remoteModules;
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Form>
+        <UserSelect />
+      </Form>
+    </PureGlobal>
+  );
+});
 
 render(<BaseExample />);
 

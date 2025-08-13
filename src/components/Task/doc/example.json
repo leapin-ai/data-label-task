@@ -13,36 +13,10 @@
         {
           "name": "_Task",
           "packageName": "@components/Task"
-        }
-      ]
-    },
-    {
-      "title": "表单页",
-      "description": "表单页",
-      "code": "./form-inner.js",
-      "scope": [
-        {
-          "name": "remoteLoader",
-          "packageName": "@kne/remote-loader"
         },
         {
-          "name": "_Task",
-          "packageName": "@components/Task"
-        }
-      ]
-    },
-    {
-      "title": "详情页",
-      "description": "详情页",
-      "code": "./detail.js",
-      "scope": [
-        {
-          "name": "remoteLoader",
-          "packageName": "@kne/remote-loader"
-        },
-        {
-          "name": "_Task",
-          "packageName": "@components/Task"
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
         }
       ]
     },
@@ -58,6 +32,10 @@
         {
           "name": "_Task",
           "packageName": "@components/Task"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
         }
       ]
     }
