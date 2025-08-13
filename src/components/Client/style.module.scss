@@ -6,6 +6,7 @@
     .ant-modal-content {
       background: transparent;
       box-shadow: none;
+      pointer-events: none;
     }
   }
 }

@@ -2,7 +2,7 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useState, useRef } from 'react';
 import Fetch from '@kne/react-fetch';
-import { Button, Flex, Empty } from 'antd';
+import { Button, Flex, Empty, Progress } from 'antd';
 import { CheckCircleFilled, ClockCircleFilled } from '@ant-design/icons';
 import Lottie from '@components/Lottie';
 import localStorage from '@kne/local-storage';
@@ -96,7 +96,7 @@ const CaseDetail = createWithRemoteLoader({
         return (
           <div ref={currentRef}>
             <InfoPage>
-              <InfoPage.Part title="任务信息">
+              <InfoPage.Part title="任务信息" subtitle={<Progress percentPosition={{ align: 'end', type: 'inner' }} size={{ height: 24 }} percent={Math.round((100 * data.completeCount) / data.totalCount)} />}>
                 <CentralContent
                   dataSource={data.task}
                   columns={[
@@ -421,6 +421,7 @@ const TaskDetail = createWithRemoteLoader({
           setSearchParams(searchParams => {
             const newSearchParams = new URLSearchParams(searchParams);
             newSearchParams.set('tab', name);
+            newSearchParams.delete('taskCaseId');
             return newSearchParams;
           });
         },
