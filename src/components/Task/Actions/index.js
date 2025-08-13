@@ -1,5 +1,4 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Button } from 'antd';
 import Start from './Start';
 import Reset from './Reset';
 import Completed from './Completed';

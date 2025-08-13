@@ -1,5 +1,3 @@
-import style from './style.module.scss';
-
 export { default as Detail } from './Detail';
 export { default as TabDetail } from './TabDetail';
 export { default } from './List';
