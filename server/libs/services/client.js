@@ -60,12 +60,12 @@ module.exports = fp(async (fastify, options) => {
       }
     });
 
-    if (task.project.status !== 'open') {
-      throw new NotFound('Project already closed');
-    }
-
     if (!task) {
       throw new NotFound('Task not found');
+    }
+
+    if (task.project.status !== 'open') {
+      throw new NotFound('Project already closed');
     }
 
     return task;

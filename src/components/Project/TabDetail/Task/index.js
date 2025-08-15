@@ -9,15 +9,17 @@ import { getToken } from '@kne/token-storage';
 import style from '../style.module.scss';
 
 const Task = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset', 'components-core:Table@TablePage', 'components-core:FormInfo', 'components-ckeditor:Editor', 'components-core:File@Download', 'components-core:ConfirmButton']
+  modules: ['components-core:Global@usePreset', 'components-core:Table', 'components-core:FormInfo', 'components-ckeditor:Editor', 'components-core:File@Download', 'components-core:ConfirmButton']
 })(({ remoteModules, data }) => {
-  const [usePreset, TablePage, FormInfo, Editor, Download, ConfirmButton] = remoteModules;
+  const [usePreset, Table, FormInfo, Editor, Download, ConfirmButton] = remoteModules;
   const { apis, ajax } = usePreset();
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const { useFormModal } = FormInfo;
   const { message } = App.useApp();
   const formModal = useFormModal();
   const ref = useRef();
+  const { TablePage, useSelectedRow } = Table;
+  const selectedRow = useSelectedRow();
+  const { selectedRowKeys, setSelectedRowKeys } = selectedRow;
   const { Input, DatePicker, InputNumber } = FormInfo.fields;
   return (
     <Flex vertical gap={8} flex={1}>
@@ -124,6 +126,7 @@ const Task = createWithRemoteLoader({
                           return;
                         }
                         message.success('删除成功');
+                        setSelectedRowKeys([]);
                         ref.current.reload();
                       }}
                     >
@@ -154,39 +157,7 @@ const Task = createWithRemoteLoader({
                 params: { projectId: data.id }
               })}
               {...props}
-              rowSelection={{
-                type: 'checkbox',
-                selectedRowKeys,
-                onSelectAll: (type, selected, items) => {
-                  const ids = items.map(({ id }) => id);
-                  if (type) {
-                    setSelectedRowKeys(value => {
-                      return uniq([...value, ...ids]);
-                    });
-                  } else {
-                    setSelectedRowKeys(value => {
-                      return value.filter(item => {
-                        return ids.indexOf(item) === -1;
-                      });
-                    });
-                  }
-                },
-                onSelect: (item, type) => {
-                  if (type) {
-                    setSelectedRowKeys(value => {
-                      const newValue = value.slice(0);
-                      newValue.push(item.id);
-                      return newValue;
-                    });
-                  } else {
-                    setSelectedRowKeys(value => {
-                      const newValue = value.slice(0);
-                      newValue.splice(newValue.indexOf(item.id), 1);
-                      return newValue;
-                    });
-                  }
-                }
-              }}
+              rowSelection={selectedRow}
               name="project-task-list"
               pagination={{ paramsType: 'params' }}
               ref={ref}
