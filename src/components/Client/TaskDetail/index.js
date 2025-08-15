@@ -289,15 +289,33 @@ const CaseList = createWithRemoteLoader({
   const [usePreset, TablePage] = remoteModules;
   const { apis } = usePreset();
   const navigate = useNavigate();
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    perPage: 20
-  });
-  const params = { id, ...pagination };
   return (
-    <Fetch
-      {...Object.assign({}, apis.client.taskCase.list, { params })}
-      render={({ data }) => {
+    <TablePage
+      {...Object.assign({}, apis.client.taskCase.list, {
+        transformData: data => {
+          return Object.assign({}, data, {
+            pageData: data.pageData.map(item => {
+              return Object.assign(
+                {},
+                item.dataSource.data,
+                {
+                  id: item.id,
+                  taskCase: item.taskCase,
+                  isCompleted: item.isCompleted,
+                  startTime: item.startTime,
+                  completeTime: item.completeTime
+                },
+                item.result
+              );
+            })
+          });
+        }
+      })}
+      params={{ id }}
+      pagination={{
+        paramsType: 'params'
+      }}
+      columns={data => {
         const columns = data.task.project.fields.map(({ name, label }) => {
           return {
             name: name,
@@ -305,97 +323,58 @@ const CaseList = createWithRemoteLoader({
             ellipsis: true
           };
         });
-        return (
-          <TablePage
-            {...Object.assign(
-              {},
-              {
-                loader: ({ data }) => data,
-                transformData: data => {
-                  return Object.assign({}, data, {
-                    pageData: data.pageData.map(item => {
-                      return Object.assign(
-                        {},
-                        item.dataSource.data,
-                        {
-                          id: item.id,
-                          taskCase: item.taskCase,
-                          isCompleted: item.isCompleted,
-                          startTime: item.startTime,
-                          completeTime: item.completeTime
-                        },
-                        item.result
-                      );
-                    })
-                  });
+        return [
+          {
+            name: 'id',
+            title: 'ID',
+            type: 'serialNumber',
+            primary: false,
+            hover: false
+          },
+          {
+            name: 'isCompleted',
+            title: '是否完成',
+            type: 'otherSmall',
+            valueOf: item => {
+              return item.isCompleted ? (
+                <Flex style={{ color: 'var(--color-success)' }}>
+                  <CheckCircleFilled />
+                </Flex>
+              ) : (
+                <Flex style={{ color: 'var(--font-color-grey-3)' }}>
+                  <ClockCircleFilled />
+                </Flex>
+              );
+            }
+          },
+          {
+            name: 'costTime',
+            title: '耗时',
+            type: 'otherSmall',
+            valueOf: ({ startTime, completeTime }) => {
+              if (!startTime || !completeTime) return;
+              const diff = (new Date(completeTime) - new Date(startTime)) / 1000;
+              return `${diff.toFixed(2)}s`;
+            }
+          },
+          ...columns,
+          {
+            name: 'options',
+            title: '操作',
+            type: 'options',
+            fixed: 'right',
+            valueOf: item => {
+              return [
+                {
+                  children: '任务详情',
+                  onClick: () => {
+                    navigate(`/task/${id}?taskCaseId=${item.id}&tab=detail`);
+                  }
                 }
-              }
-            )}
-            params={params}
-            data={data}
-            pagination={{
-              paramsType: 'params',
-              onChange: (page, size) => {
-                setPagination({
-                  currentPage: page,
-                  perPage: size
-                });
-              }
-            }}
-            columns={[
-              {
-                name: 'id',
-                title: 'ID',
-                type: 'serialNumber',
-                primary: false,
-                hover: false
-              },
-              {
-                name: 'isCompleted',
-                title: '是否完成',
-                type: 'otherSmall',
-                valueOf: item => {
-                  return item.isCompleted ? (
-                    <Flex style={{ color: 'var(--color-success)' }}>
-                      <CheckCircleFilled />
-                    </Flex>
-                  ) : (
-                    <Flex style={{ color: 'var(--font-color-grey-3)' }}>
-                      <ClockCircleFilled />
-                    </Flex>
-                  );
-                }
-              },
-              {
-                name: 'costTime',
-                title: '耗时',
-                type: 'otherSmall',
-                valueOf: ({ startTime, completeTime }) => {
-                  if (!startTime || !completeTime) return;
-                  const diff = (new Date(completeTime) - new Date(startTime)) / 1000;
-                  return `${diff.toFixed(2)}s`;
-                }
-              },
-              ...columns,
-              {
-                name: 'options',
-                title: '操作',
-                type: 'options',
-                fixed: 'right',
-                valueOf: item => {
-                  return [
-                    {
-                      children: '任务详情',
-                      onClick: () => {
-                        navigate(`/task/${id}?taskCaseId=${item.id}&tab=detail`);
-                      }
-                    }
-                  ];
-                }
-              }
-            ]}
-          />
-        );
+              ];
+            }
+          }
+        ];
       }}
     />
   );
