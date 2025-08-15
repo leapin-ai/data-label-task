@@ -36,6 +36,10 @@ const getApis = options => {
       includeData: {
         url: `${prefix}/data-source/include`,
         method: 'POST'
+      },
+      removeBatch: {
+        url: `${prefix}/data-source/remove-batch`,
+        method: 'POST'
       }
     },
     task: {
@@ -86,6 +90,10 @@ const getApis = options => {
       exportResult: {
         url: `${prefix}/task/export-result`,
         method: 'GET'
+      },
+      removeBatch: {
+        url: `${prefix}/task/remove-batch`,
+        method: 'POST'
       }
     },
     client: {

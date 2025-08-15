@@ -421,6 +421,24 @@ module.exports = fp(async (fastify, options) => {
     }
   };
 
+  const removeBatch = async (authenticatePayload, { ids }) => {
+    await models.taskCase.destroy({
+      where: {
+        taskId: {
+          [Op.in]: ids
+        }
+      }
+    });
+
+    await models.task.destroy({
+      where: {
+        id: {
+          [Op.in]: ids
+        }
+      }
+    });
+  };
+
   Object.assign(fastify[options.name].services, {
     task: {
       create,
@@ -434,7 +452,8 @@ module.exports = fp(async (fastify, options) => {
       allocator,
       split,
       copy,
-      exportResult
+      exportResult,
+      removeBatch
     }
   });
 });

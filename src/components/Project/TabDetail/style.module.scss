@@ -1,0 +1,35 @@
+.menu-list {
+  :global {
+    .ant-dropdown-menu-item {
+      padding: 0 !important;
+      background: transparent !important;
+    }
+
+    .button-group-item {
+      padding: 5px 8px !important;
+      border: none;
+      width: 100%;
+
+      &:not(:disabled) {
+        color: var(--primary-color);
+      }
+
+      &:disabled {
+        background: #ffffff;
+      }
+
+      .ant-btn-primary {
+        color: #ffffff;
+      }
+
+      .ant-btn-loading-icon {
+        display: none;
+      }
+
+      &:hover:not(:disabled) {
+        color: var(--primary-color);
+        background: var(--primary-color-1) !important;
+      }
+    }
+  }
+}
