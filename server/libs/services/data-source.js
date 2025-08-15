@@ -4,14 +4,13 @@ const transform = require('lodash/transform');
 
 module.exports = fp(async (fastify, options) => {
   const { models, services } = fastify[options.name];
-
+  const { Op } = fastify.sequelize.Sequelize;
   const list = async ({ projectId, perPage, currentPage }) => {
     const project = await services.project.detail({ id: projectId });
     const { count, rows } = await models.dataSource.findAndCountAll({
       where: { projectId: project.id },
       offset: perPage * (currentPage - 1),
-      limit: perPage,
-      order: [['createdAt', 'DESC']]
+      limit: perPage
     });
 
     return {
@@ -86,9 +85,32 @@ module.exports = fp(async (fastify, options) => {
     };
   };
 
+  const removeBatch = async ({ ids }) => {
+    if (
+      (await models.taskCase.count({
+        where: {
+          dataSourceId: {
+            [Op.in]: ids
+          }
+        }
+      })) > 0
+    ) {
+      throw new Error('删除的目标中含有关联任务项的数据源');
+    }
+
+    await models.dataSource.destroy({
+      where: {
+        id: {
+          [Op.in]: ids
+        }
+      }
+    });
+  };
+
   Object.assign(fastify[options.name].services, {
     dataSource: {
       list,
+      removeBatch,
       exportData,
       includeData,
       downloadTemplate

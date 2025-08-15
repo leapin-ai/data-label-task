@@ -1,13 +1,16 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Flex, Button, Alert } from 'antd';
+import { Flex, Button, Alert, Dropdown, App } from 'antd';
 import { useState, useRef } from 'react';
+import uniq from 'lodash/uniq';
+import style from '../style.module.scss';
 
 const DataSource = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset', 'components-core:Table@TablePage', 'components-core:FormInfo', 'components-core:File@Download']
+  modules: ['components-core:Global@usePreset', 'components-core:Table@TablePage', 'components-core:FormInfo', 'components-core:File@Download', 'components-core:ConfirmButton']
 })(({ remoteModules, data }) => {
-  const [usePreset, TablePage, FormInfo, Download] = remoteModules;
+  const [usePreset, TablePage, FormInfo, Download, ConfirmButton] = remoteModules;
   const { ajax, apis } = usePreset();
-  const [selected] = useState([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const { message } = App.useApp();
   const { useFormModal } = FormInfo;
   const formModal = useFormModal();
   const { Upload } = FormInfo.fields;
@@ -63,7 +66,40 @@ const DataSource = createWithRemoteLoader({
           >
             上传数据
           </Button>
-          <Button size="small">批量操作{selected.length > 0 ? `(${selected.length}条)` : ''}</Button>
+          <Dropdown
+            rootClassName={style['menu-list']}
+            menu={{
+              items: [
+                {
+                  key: 'remove',
+                  label: (
+                    <ConfirmButton
+                      size="small"
+                      className="button-group-item"
+                      onClick={async () => {
+                        const { data: resData } = await ajax(
+                          Object.assign({}, apis.dataSource.removeBatch, {
+                            data: { ids: selectedRowKeys }
+                          })
+                        );
+                        if (resData.code !== 0) {
+                          return;
+                        }
+                        message.success('删除成功');
+                        ref.current.reload();
+                      }}
+                    >
+                      删除
+                    </ConfirmButton>
+                  )
+                }
+              ]
+            }}
+          >
+            <Button size="small" disabled={selectedRowKeys.length === 0}>
+              批量操作{selectedRowKeys.length > 0 ? `(${selectedRowKeys.length}条)` : ''}
+            </Button>
+          </Dropdown>
         </Flex>
       </Flex>
       <TablePage
@@ -72,7 +108,7 @@ const DataSource = createWithRemoteLoader({
           transformData: data => {
             return Object.assign({}, data, {
               pageData: data.pageData.map(item => {
-                return item.data;
+                return Object.assign({}, item.data, { id: item.id });
               })
             });
           }
@@ -80,7 +116,44 @@ const DataSource = createWithRemoteLoader({
         name="data-source-list"
         pagination={{ paramsType: 'params' }}
         ref={ref}
+        rowSelection={{
+          type: 'checkbox',
+          selectedRowKeys,
+          onSelectAll: (type, selected, items) => {
+            const ids = items.map(({ id }) => id);
+            if (type) {
+              setSelectedRowKeys(value => {
+                return uniq([...value, ...ids]);
+              });
+            } else {
+              setSelectedRowKeys(value => {
+                return value.filter(item => {
+                  return ids.indexOf(item) === -1;
+                });
+              });
+            }
+          },
+          onSelect: (item, type) => {
+            if (type) {
+              setSelectedRowKeys(value => {
+                const newValue = value.slice(0);
+                newValue.push(item.id);
+                return newValue;
+              });
+            } else {
+              setSelectedRowKeys(value => {
+                const newValue = value.slice(0);
+                newValue.splice(newValue.indexOf(item.id), 1);
+                return newValue;
+              });
+            }
+          }
+        }}
         columns={[
+          {
+            name: 'id',
+            title: 'ID'
+          },
           ...data.fields.map(({ name, label }) => {
             return {
               name: name,

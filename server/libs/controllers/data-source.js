@@ -71,4 +71,31 @@ module.exports = fp(async (fastify, options) => {
       return services.dataSource.includeData(request.body);
     }
   );
+
+  fastify.post(
+    `${options.prefix}/data-source/remove-batch`,
+    {
+      onRequest: [userAuthenticate, adminAuthenticate],
+      schema: {
+        summary: '批量删除数据源',
+        body: {
+          type: 'object',
+          properties: {
+            ids: {
+              type: 'array',
+              items: {
+                type: 'string'
+              },
+              minLength: 1
+            }
+          },
+          required: ['ids']
+        }
+      }
+    },
+    async request => {
+      await services.dataSource.removeBatch(request.body);
+      return {};
+    }
+  );
 });

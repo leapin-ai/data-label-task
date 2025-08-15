@@ -7,7 +7,7 @@ const ExportResult = createWithRemoteLoader({
   const [Download, usePreset] = remoteModules;
   const { apis } = usePreset();
   return (
-    <Download {...props} src={`${apis.task.exportResult.url}?token=${getToken('X-User-Token')}&ids[]=${data.id}`}>
+    <Download {...props} src={`${apis.task.exportResult.url}?token=${getToken('X-User-Token')}&ids=${data.id}`}>
       导出
     </Download>
   );

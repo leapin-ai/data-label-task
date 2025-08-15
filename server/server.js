@@ -6,6 +6,7 @@ const fastify = require('fastify')({
 const fastifyEnv = require('@fastify/env');
 const packageJson = require('./package.json');
 const path = require('node:path');
+const { NotFound } = require('http-errors');
 
 const version = `v${packageJson.version.split('.')[0]}`;
 
@@ -149,6 +150,8 @@ const createServer = () => {
     })
   );
 
+  fastify.register(require('@kne/fastify-shorten'));
+
   fastify.register(
     require('fastify-plugin')(async fastify => {
       await fastify.sequelize.sync();
@@ -175,7 +178,7 @@ const createServer = () => {
         if (req.method === 'GET') {
           reply.sendFile(getEntry(), { root: path.join(__dirname, './build') });
         } else {
-          reply.code(404).send({ error: 'Not Found' });
+          throw new NotFound();
         }
       });
     })
