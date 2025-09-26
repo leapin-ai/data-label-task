@@ -29,10 +29,13 @@ const FormInner = createWithRemoteLoader({
               { value: 'boolean', label: '布尔值' },
               { value: 'number', label: '数字' },
               { value: 'file', label: '文件' },
-              { value: 'enum', label: '枚举' }
+              { value: 'enum', label: '枚举' },
+              { value: 'hidden', label: '隐藏字段' },
+              { value: 'compare', label: '比较文本' }
             ]}
           />,
-          <Switch name="needAnnotate" label="是否需要标注" />,
+          <Input type="hidden" name="needAnnotate" defaultValue="true" display={({ formData, groupArgs }) => get(formData, `fields.${groupArgs[0].index}.annotateType`) === 'compare'} />,
+          <Switch name="needAnnotate" label="是否需要标注" display={({ formData, groupArgs }) => ['hidden', 'compare'].indexOf(get(formData, `fields.${groupArgs[0].index}.annotateType`)) === -1} />,
           <Input
             name="annotateRule"
             label="标注校验规则"
