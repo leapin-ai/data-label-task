@@ -15,7 +15,7 @@ const Lottie = ({ path, loop = true, ...props }) => {
     return () => {
       animation.destroy();
     };
-  }, [path]);
+  }, [path, loop]);
   return <div {...props} ref={ref} />;
 };
 

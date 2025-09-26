@@ -82,7 +82,7 @@ export const globalInit = async () => {
     //url: 'http://localhost:3001',
     //tpl: '{{url}}',
     remote: 'components-core',
-    defaultVersion: '0.4.11'
+    defaultVersion: '0.4.15'
   };
   remoteLoaderPreset({
     remotes: {
@@ -102,6 +102,11 @@ export const globalInit = async () => {
         ...registry,
         remote: 'components-file-manager',
         defaultVersion: '0.1.1'
+      },
+      'components-document': {
+        ...registry,
+        remote: 'components-document',
+        defaultVersion: '0.1.6'
       },
       'components-admin': {
         ...registry,
@@ -181,6 +186,32 @@ export const globalInit = async () => {
       },
       getApis()
     ),
+    formInfo: {
+      rules: {
+        NUM_VALUE: (value, start, end) => {
+          value = Number(value);
+          if (end === start && value !== Number(end)) {
+            return {
+              result: false,
+              errMsg: `%s必须等于${end}`
+            };
+          }
+          if (value < start) {
+            return {
+              result: false,
+              errMsg: `%s必须大于等于${start}`
+            };
+          }
+          if (end && value > end) {
+            return {
+              result: false,
+              errMsg: `%s必须小于等于${end}`
+            };
+          }
+          return { result: true };
+        }
+      }
+    },
     themeToken: {
       colorPrimary: '#4183F0'
     }

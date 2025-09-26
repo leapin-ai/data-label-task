@@ -1,5 +1,6 @@
 const fp = require('fastify-plugin');
 const { NotFound, Forbidden } = require('http-errors');
+const get = require('lodash/get');
 
 module.exports = fp(async (fastify, options) => {
   const { models, services } = fastify[options.name];
@@ -13,6 +14,12 @@ module.exports = fp(async (fastify, options) => {
     }
     const { rows, count } = await models.task.findAndCountAll({
       attributes: ['id', 'name', 'completeTime', 'description', 'status', 'tracking'],
+      include: {
+        model: models.project,
+        where: {
+          status: 'open'
+        }
+      },
       where: {
         ...whereQuery,
         allocatorUserId: userId
@@ -54,12 +61,12 @@ module.exports = fp(async (fastify, options) => {
       }
     });
 
-    if (task.project.status !== 'open') {
-      throw new NotFound('Project already closed');
-    }
-
     if (!task) {
       throw new NotFound('Task not found');
+    }
+
+    if (task.project.status !== 'open') {
+      throw new NotFound('Project already closed');
     }
 
     return task;
@@ -67,49 +74,69 @@ module.exports = fp(async (fastify, options) => {
 
   const taskCaseDetail = async (authenticatePayload, { id, taskCaseId, vector }) => {
     const task = await taskDetail(authenticatePayload, { id });
+    const hiddenFields = task.project.fields.filter(item => item.annotateType === 'hidden');
+    const dataSourceFieldsHidden = async input => {
+      if (hiddenFields.length > 0) {
+        const value = await input;
+        hiddenFields.forEach(({ name }) => {
+          get(value, `dataSource.data[${name}]`) && delete value.dataSource.data[name];
+        });
+        return value;
+      }
+      return input;
+    };
+
     const taskCase = await (() => {
       if (taskCaseId && vector === 'next') {
-        return models.taskCase.findOne({
-          include: models.dataSource,
-          where: {
-            id: {
-              [Op.gt]: taskCaseId
+        return dataSourceFieldsHidden(
+          models.taskCase.findOne({
+            include: models.dataSource,
+            where: {
+              id: {
+                [Op.gt]: taskCaseId
+              },
+              taskId: task.id,
+              isCompleted: false
             },
-            taskId: task.id,
-            isCompleted: false
-          },
-          order: [['id', 'ASC']]
-        });
+            order: [['id', 'ASC']]
+          })
+        );
       }
       if (taskCaseId && vector === 'prev') {
-        return models.taskCase.findOne({
-          include: models.dataSource,
-          where: {
-            id: {
-              [Op.lt]: taskCaseId
-            },
-            taskId: task.id,
-            isCompleted: false
-          }
-        });
+        return dataSourceFieldsHidden(
+          models.taskCase.findOne({
+            include: models.dataSource,
+            where: {
+              id: {
+                [Op.lt]: taskCaseId
+              },
+              taskId: task.id,
+              isCompleted: false
+            }
+          })
+        );
       }
 
       if (taskCaseId) {
-        return models.taskCase.findOne({
-          include: models.dataSource,
-          where: {
-            id: taskCaseId
-          }
-        });
+        return dataSourceFieldsHidden(
+          models.taskCase.findOne({
+            include: models.dataSource,
+            where: {
+              id: taskCaseId
+            }
+          })
+        );
       }
 
-      return models.taskCase.findOne({
-        include: models.dataSource,
-        where: {
-          isCompleted: false,
-          taskId: task.id
-        }
-      });
+      return dataSourceFieldsHidden(
+        models.taskCase.findOne({
+          include: models.dataSource,
+          where: {
+            isCompleted: false,
+            taskId: task.id
+          }
+        })
+      );
     })();
 
     const taskCaseCounts = await models.taskCase.findAll({
@@ -155,7 +182,8 @@ module.exports = fp(async (fastify, options) => {
         taskId: task.id
       }),
       offset: perPage * (currentPage - 1),
-      limit: perPage
+      limit: perPage,
+      order: [['id', 'ASC']]
     });
 
     return {

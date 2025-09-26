@@ -2,7 +2,7 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useState, useRef } from 'react';
 import Fetch from '@kne/react-fetch';
-import { Button, Flex, Empty } from 'antd';
+import { Button, Flex, Empty, Progress } from 'antd';
 import { CheckCircleFilled, ClockCircleFilled } from '@ant-design/icons';
 import Lottie from '@components/Lottie';
 import localStorage from '@kne/local-storage';
@@ -24,7 +24,7 @@ const CaseDetail = createWithRemoteLoader({
   const [usePreset, InfoPage, CentralContent, Enum, EditorContent, Editor, LoadingButton, FormInfo, useModal] = remoteModules;
   const { ajax, apis } = usePreset();
   const { Form, SubmitButton } = FormInfo;
-  const { Input, InputNumber, Switch, TextArea, Select, Upload } = FormInfo.fields;
+  const { Input, InputNumber, Switch, TextArea, Select, Upload, RadioGroup } = FormInfo.fields;
   const currentTaskCaseIdRef = useRef(taskCaseId);
   const currentRef = useRef();
   const modal = useModal();
@@ -93,10 +93,46 @@ const CaseDetail = createWithRemoteLoader({
             data.taskCase?.id ? newSearchParams.set('taskCaseId', data.taskCase.id) : newSearchParams.delete('taskCaseId');
             return newSearchParams;
           });
+
+        const fieldList = data.task.project.fields
+          .filter(({ needAnnotate, annotateType }) => !!needAnnotate && ['compare', 'hidden'].indexOf(annotateType) === -1)
+          .map(({ name, label, annotateType, annotateRule, annotateEnum }) => {
+            if (annotateType === 'number') {
+              return <InputNumber name={name} label={label} rule={annotateRule} />;
+            }
+            if (annotateType === 'boolean') {
+              return <Switch name={name} label={label} rule={annotateRule} />;
+            }
+            if (annotateType === 'enum') {
+              return <Select name={name} label={label} rule={annotateRule} options={annotateEnum} />;
+            }
+            if (annotateType === 'text') {
+              return <TextArea name={name} label={label} rule={annotateRule} />;
+            }
+            if (annotateType === 'richText') {
+              return <Editor name={name} label={label} rule={annotateRule} />;
+            }
+            if (annotateType === 'file') {
+              return <Upload name={name} label={label} rule={annotateRule} />;
+            }
+            return <Input name={name} label={label} rule={annotateRule} />;
+          });
+
+        const compareOptions = data.task.project.fields
+          .filter(({ annotateType }) => annotateType === 'compare')
+          .map(({ name }) => {
+            const value = data.taskCase?.dataSource.data[name];
+            return { value: name, label: value };
+          });
+
+        if (compareOptions.length > 0) {
+          fieldList.push(<RadioGroup name="__compare" className={style['compare-field']} label="比较内容" description="请选择一个你认为更好的内容" rule="REQ" options={compareOptions} />);
+        }
+
         return (
           <div ref={currentRef}>
             <InfoPage>
-              <InfoPage.Part title="任务信息">
+              <InfoPage.Part title="任务信息" subtitle={<Progress percentPosition={{ align: 'end', type: 'inner' }} size={{ height: 24 }} percent={Math.round((100 * data.completeCount) / data.totalCount)} />}>
                 <CentralContent
                   dataSource={data.task}
                   columns={[
@@ -192,6 +228,11 @@ const CaseDetail = createWithRemoteLoader({
                   key={data.taskCase.id}
                   data={data.taskCase.result}
                   onSubmit={async formData => {
+                    const compare = formData.__compare;
+                    delete formData.__compare;
+                    compareOptions.forEach(item => {
+                      formData[item.value] = item.value === compare;
+                    });
                     const { data: resData } = await ajax(
                       Object.assign({}, apis.client.taskCase.submit, {
                         data: Object.assign({}, { id: data.taskCase.id, result: formData })
@@ -219,33 +260,7 @@ const CaseDetail = createWithRemoteLoader({
                     });
                   }}
                 >
-                  <FormInfo
-                    column={1}
-                    list={data.task.project.fields
-                      .filter(({ needAnnotate }) => !!needAnnotate)
-                      .map(({ name, label, annotateType, annotateRule, annotateEnum }) => {
-                        if (annotateType === 'number') {
-                          return <InputNumber name={name} label={label} rule={annotateRule} />;
-                        }
-                        if (annotateType === 'boolean') {
-                          return <Switch name={name} label={label} rule={annotateRule} />;
-                        }
-                        if (annotateType === 'enum') {
-                          return <Select name={name} label={label} rule={annotateRule} options={annotateEnum} />;
-                        }
-                        if (annotateType === 'text') {
-                          return <TextArea name={name} label={label} rule={annotateRule} />;
-                        }
-                        if (annotateType === 'richText') {
-                          return <Editor name={name} label={label} rule={annotateRule} />;
-                        }
-                        if (annotateType === 'file') {
-                          return <Upload name={name} label={label} rule={annotateRule} />;
-                        }
-
-                        return <Input name={name} label={label} rule={annotateRule} />;
-                      })}
-                  />
+                  <FormInfo column={1} list={fieldList} />
                   <Flex gap={8} justify="center">
                     <LoadingButton
                       onClick={async () => {
@@ -290,107 +305,94 @@ const CaseList = createWithRemoteLoader({
   const { apis } = usePreset();
   const navigate = useNavigate();
   return (
-    <Fetch
-      {...Object.assign({}, apis.client.taskCase.list, { params: { id } })}
-      render={({ data, reload }) => {
+    <TablePage
+      {...Object.assign({}, apis.client.taskCase.list, {
+        transformData: data => {
+          return Object.assign({}, data, {
+            pageData: data.pageData.map(item => {
+              return Object.assign(
+                {},
+                item.dataSource.data,
+                {
+                  id: item.id,
+                  taskCase: item.taskCase,
+                  isCompleted: item.isCompleted,
+                  startTime: item.startTime,
+                  completeTime: item.completeTime
+                },
+                item.result
+              );
+            })
+          });
+        }
+      })}
+      params={{ id }}
+      pagination={{
+        paramsType: 'params'
+      }}
+      columns={data => {
         const columns = data.task.project.fields.map(({ name, label }) => {
           return {
             name: name,
             title: label,
-            ellipsis: true
+            ellipsis: true,
+            valueOf: item => {
+              return String(item[name]);
+            }
           };
         });
-        return (
-          <TablePage
-            {...Object.assign(
-              {},
-              {
-                loader: () => data,
-                transformData: data => {
-                  return Object.assign({}, data, {
-                    pageData: data.pageData.map(item => {
-                      return Object.assign(
-                        {},
-                        item.dataSource.data,
-                        {
-                          id: item.id,
-                          taskCase: item.taskCase,
-                          isCompleted: item.isCompleted,
-                          startTime: item.startTime,
-                          completeTime: item.completeTime
-                        },
-                        item.result
-                      );
-                    })
-                  });
-                }
-              }
-            )}
-            pagination={{
-              paramsType: 'params',
-              onChange: (page, size) => {
-                reload({
-                  params: {
-                    currentPage: page,
-                    perPage: size
+        return [
+          {
+            name: 'id',
+            title: 'ID',
+            type: 'serialNumber',
+            primary: false,
+            hover: false
+          },
+          {
+            name: 'isCompleted',
+            title: '是否完成',
+            type: 'otherSmall',
+            valueOf: item => {
+              return item.isCompleted ? (
+                <Flex style={{ color: 'var(--color-success)' }}>
+                  <CheckCircleFilled />
+                </Flex>
+              ) : (
+                <Flex style={{ color: 'var(--font-color-grey-3)' }}>
+                  <ClockCircleFilled />
+                </Flex>
+              );
+            }
+          },
+          {
+            name: 'costTime',
+            title: '耗时',
+            type: 'otherSmall',
+            valueOf: ({ startTime, completeTime }) => {
+              if (!startTime || !completeTime) return;
+              const diff = (new Date(completeTime) - new Date(startTime)) / 1000;
+              return `${diff.toFixed(2)}s`;
+            }
+          },
+          ...columns,
+          {
+            name: 'options',
+            title: '操作',
+            type: 'options',
+            fixed: 'right',
+            valueOf: item => {
+              return [
+                {
+                  children: '任务详情',
+                  onClick: () => {
+                    navigate(`/task/${id}?taskCaseId=${item.id}&tab=detail`);
                   }
-                });
-              }
-            }}
-            columns={[
-              {
-                name: 'id',
-                title: 'ID',
-                type: 'serialNumber',
-                primary: false,
-                hover: false
-              },
-              ...columns,
-              {
-                name: 'isCompleted',
-                title: '是否完成',
-                type: 'otherSmall',
-                valueOf: item => {
-                  return item.isCompleted ? (
-                    <Flex style={{ color: 'var(--color-success)' }}>
-                      <CheckCircleFilled />
-                    </Flex>
-                  ) : (
-                    <Flex style={{ color: 'var(--font-color-grey-3)' }}>
-                      <ClockCircleFilled />
-                    </Flex>
-                  );
                 }
-              },
-              {
-                name: 'costTime',
-                title: '耗时',
-                type: 'otherSmall',
-                valueOf: ({ startTime, completeTime }) => {
-                  if (!startTime || !completeTime) return;
-                  const diff = (new Date(completeTime) - new Date(startTime)) / 1000;
-                  return `${diff.toFixed(2)}s`;
-                }
-              },
-              {
-                name: 'options',
-                title: '操作',
-                type: 'options',
-                fixed: 'right',
-                valueOf: item => {
-                  return [
-                    {
-                      children: '任务详情',
-                      onClick: () => {
-                        navigate(`/task/${id}?taskCaseId=${item.id}&tab=detail`);
-                      }
-                    }
-                  ];
-                }
-              }
-            ]}
-          />
-        );
+              ];
+            }
+          }
+        ];
       }}
     />
   );
@@ -416,6 +418,7 @@ const TaskDetail = createWithRemoteLoader({
           setSearchParams(searchParams => {
             const newSearchParams = new URLSearchParams(searchParams);
             newSearchParams.set('tab', name);
+            newSearchParams.delete('taskCaseId');
             return newSearchParams;
           });
         },

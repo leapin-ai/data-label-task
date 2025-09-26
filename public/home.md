@@ -1,25 +1,3 @@
-import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Flex } from 'antd';
-import Lottie from '@components/Lottie';
-
-const Home = createWithRemoteLoader({
-  modules: ['components-core:Layout@Page', 'components-document:MarkdownRender']
-})(({ remoteModules, ...props }) => {
-  const [Page, MarkdownRender] = remoteModules;
-
-  return (
-    <Page {...props}>
-      <Flex vertical gap={24}>
-        <Flex justify="center">
-          <Lottie path="/lottiefiles/data-label.json" style={{ height: '300px' }} />
-        </Flex>
-        <Flex
-          style={{
-            padding: '0 120px'
-          }}
-        >
-          <MarkdownRender
-            content={`
 > 数据标注系统使用指南
 
 数据标注系统是一个专为数据标注工作设计的平台，帮助您高效地完成各类数据标注任务。系统界面直观友好，操作简单，无需技术背景即可快速上手。
@@ -109,14 +87,3 @@ A: 在任务详情页面的"历史记录"标签可查看所有标注历史。
 A: 每个任务都配有详细的标注指南，如有疑问，请联系您的项目管理员。
 
 ---
-
-`}
-            assetsPath={window.PUBLIC_URL + '/assets'}
-          />
-        </Flex>
-      </Flex>
-    </Page>
-  );
-});
-
-export default Home;

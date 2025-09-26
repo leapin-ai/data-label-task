@@ -1,16 +1,20 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Flex, Button, Alert } from 'antd';
-import { useState, useRef } from 'react';
+import { Flex, Button, Alert, Dropdown, App } from 'antd';
+import { useRef } from 'react';
+import style from '../style.module.scss';
 
 const DataSource = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset', 'components-core:Table@TablePage', 'components-core:FormInfo', 'components-core:File@Download']
+  modules: ['components-core:Global@usePreset', 'components-core:Table', 'components-core:FormInfo', 'components-core:File@Download', 'components-core:ConfirmButton']
 })(({ remoteModules, data }) => {
-  const [usePreset, TablePage, FormInfo, Download] = remoteModules;
+  const [usePreset, Table, FormInfo, Download, ConfirmButton] = remoteModules;
   const { ajax, apis } = usePreset();
-  const [selected, setSelected] = useState([]);
+  const { message } = App.useApp();
   const { useFormModal } = FormInfo;
   const formModal = useFormModal();
   const { Upload } = FormInfo.fields;
+  const { TablePage, useSelectedRow } = Table;
+  const selectedRow = useSelectedRow();
+  const { selectedRowKeys, setSelectedRowKeys } = selectedRow;
   const ref = useRef();
   return (
     <Flex vertical gap={8} flex={1}>
@@ -63,7 +67,41 @@ const DataSource = createWithRemoteLoader({
           >
             上传数据
           </Button>
-          <Button size="small">批量操作{selected.length > 0 ? `(${selected.length}条)` : ''}</Button>
+          <Dropdown
+            rootClassName={style['menu-list']}
+            menu={{
+              items: [
+                {
+                  key: 'remove',
+                  label: (
+                    <ConfirmButton
+                      size="small"
+                      className="button-group-item"
+                      onClick={async () => {
+                        const { data: resData } = await ajax(
+                          Object.assign({}, apis.dataSource.removeBatch, {
+                            data: { ids: selectedRowKeys }
+                          })
+                        );
+                        if (resData.code !== 0) {
+                          return;
+                        }
+                        message.success('删除成功');
+                        setSelectedRowKeys([]);
+                        ref.current.reload();
+                      }}
+                    >
+                      删除
+                    </ConfirmButton>
+                  )
+                }
+              ]
+            }}
+          >
+            <Button size="small" disabled={selectedRowKeys.length === 0}>
+              批量操作{selectedRowKeys.length > 0 ? `(${selectedRowKeys.length}条)` : ''}
+            </Button>
+          </Dropdown>
         </Flex>
       </Flex>
       <TablePage
@@ -72,7 +110,7 @@ const DataSource = createWithRemoteLoader({
           transformData: data => {
             return Object.assign({}, data, {
               pageData: data.pageData.map(item => {
-                return item.data;
+                return Object.assign({}, item.data, { id: item.id });
               })
             });
           }
@@ -80,7 +118,12 @@ const DataSource = createWithRemoteLoader({
         name="data-source-list"
         pagination={{ paramsType: 'params' }}
         ref={ref}
+        rowSelection={selectedRow}
         columns={[
+          {
+            name: 'id',
+            title: 'ID'
+          },
           ...data.fields.map(({ name, label }) => {
             return {
               name: name,

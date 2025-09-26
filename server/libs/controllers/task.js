@@ -1,4 +1,5 @@
 const fp = require('fastify-plugin');
+const merge = require('lodash/merge');
 
 module.exports = fp(async (fastify, options) => {
   const { services } = fastify[options.name];
@@ -29,6 +30,26 @@ module.exports = fp(async (fastify, options) => {
     },
     async request => {
       return services.task.create(request.userInfo, request.body);
+    }
+  );
+
+  fastify.post(
+    `${options.prefix}/task/save`,
+    {
+      onRequest: [userAuthenticate, adminAuthenticate],
+      schema: {
+        description: '保存任务',
+        summary: '保存任务',
+        body: merge({}, taskSchema, {
+          properties: {
+            id: { type: 'string' }
+          },
+          required: ['id']
+        })
+      }
+    },
+    async request => {
+      return services.task.save(request.userInfo, request.body);
     }
   );
 
@@ -144,17 +165,14 @@ module.exports = fp(async (fastify, options) => {
           type: 'object',
           properties: {
             ids: {
-              type: 'array',
-              items: {
-                type: 'string'
-              }
+              type: 'string'
             }
           }
         }
       }
     },
     async (request, reply) => {
-      const { file, filename } = await services.task.exportResult(request.userInfo, request.query);
+      const { file, filename } = await services.task.exportResult(request.userInfo, { ids: request.query.ids.split(',') });
       reply.header('Content-Disposition', `attachment; filename=${encodeURIComponent(filename)}`);
       reply.type('application/octet-stream');
       reply.send(file);
@@ -282,6 +300,33 @@ module.exports = fp(async (fastify, options) => {
     },
     async request => {
       await services.task.action(request.userInfo, request.body);
+      return {};
+    }
+  );
+
+  fastify.post(
+    `${options.prefix}/task/remove-batch`,
+    {
+      onRequest: [userAuthenticate, adminAuthenticate],
+      schema: {
+        summary: '批量删除任务',
+        body: {
+          type: 'object',
+          properties: {
+            ids: {
+              type: 'array',
+              items: {
+                type: 'string'
+              },
+              minLength: 1
+            }
+          },
+          required: ['ids']
+        }
+      }
+    },
+    async request => {
+      await services.task.removeBatch(request.userInfo, request.body);
       return {};
     }
   );

@@ -4,7 +4,6 @@ import { Tabs } from 'antd';
 const RightOptions = createWithRemoteLoader({
   modules: []
 })(({ remoteModules }) => {
-  const [] = remoteModules;
   return (
     <Tabs
       items={[

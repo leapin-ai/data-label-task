@@ -12,7 +12,12 @@ const pages = {
   Admin: loadableWithProps(() => import('./Admin')),
   InitAdmin: loadableWithProps(() => import('./Admin').then(({ InitAdmin }) => InitAdmin)),
   Error: loadableWithProps(() => import('./Error')),
-  NotFound: loadableWithProps(() => import('./NotFound'))
+  NotFound: loadableWithProps(() => import('./NotFound')),
+  Client: loadableWithProps(() => import('../components/Client')),
+  ProjectTabDetail: loadableWithProps(() => import('../components/Project/TabDetail')),
+  ProjectList: loadableWithProps(() => import('../components/Project/List')),
+  TaskTabDetail: loadableWithProps(() => import('../components/Task/TabDetail')),
+  TaskList: loadableWithProps(() => import('../components/Task/List'))
 };
 
 export default pages;

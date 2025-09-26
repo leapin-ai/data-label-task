@@ -3,6 +3,7 @@ const { NotFound } = require('http-errors');
 const exceljs = require('exceljs');
 const JSZip = require('jszip');
 const transform = require('lodash/transform');
+const pick = require('lodash/pick');
 
 module.exports = fp(async (fastify, options) => {
   const { models, services } = fastify[options.name];
@@ -10,6 +11,11 @@ module.exports = fp(async (fastify, options) => {
 
   const create = async (authenticatePayload, data) => {
     return await models.task.create(Object.assign({}, data, { createdUserId: authenticatePayload.id }));
+  };
+
+  const save = async (authenticatePayload, { id, ...data }) => {
+    const task = await detail({ id });
+    return await task.update(pick(data, ['name', 'description', 'completeTime']));
   };
 
   const list = async ({ perPage, currentPage, projectId, taskStatus }) => {
@@ -415,9 +421,28 @@ module.exports = fp(async (fastify, options) => {
     }
   };
 
+  const removeBatch = async (authenticatePayload, { ids }) => {
+    await models.taskCase.destroy({
+      where: {
+        taskId: {
+          [Op.in]: ids
+        }
+      }
+    });
+
+    await models.task.destroy({
+      where: {
+        id: {
+          [Op.in]: ids
+        }
+      }
+    });
+  };
+
   Object.assign(fastify[options.name].services, {
     task: {
       create,
+      save,
       list,
       detail,
       caseList,
@@ -427,7 +452,8 @@ module.exports = fp(async (fastify, options) => {
       allocator,
       split,
       copy,
-      exportResult
+      exportResult,
+      removeBatch
     }
   });
 });

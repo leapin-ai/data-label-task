@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import pages from './pages';
 import './index.scss';
 
-const { Account, Admin, InitAdmin, Home, Error, NotFound } = pages;
+const { TaskList, TaskTabDetail, ProjectList, ProjectTabDetail, Client, Account, Admin, InitAdmin, Error, NotFound } = pages;
 
 const App = createWithRemoteLoader({
   modules: ['components-core:Global', 'components-admin:Authenticate@BeforeLoginLayout', 'components-admin:Authenticate@AfterUserLoginLayout', 'components-admin:Authenticate@AfterAdminUserLoginLayout']
@@ -54,10 +54,10 @@ const App = createWithRemoteLoader({
           }
         >
           <Route index element={<Navigate to={`${baseUrl}/admin/project`} replace />} />
-          <Route path="project/:id" element={<RemoteLoader key="project-detail" module="data-label-task:Project@TabDetail" />} />
-          <Route path="project" element={<RemoteLoader key="project" module="data-label-task:Project@List" />} />
-          <Route path="task/:id" element={<RemoteLoader key="task-detail" module="data-label-task:Task@TabDetail" />} />
-          <Route path="task" element={<RemoteLoader key="task" module="data-label-task:Task@List" />} />
+          <Route path="project/:id" element={<ProjectTabDetail />} />
+          <Route path="project" element={<ProjectList />} />
+          <Route path="task/:id" element={<TaskTabDetail />} />
+          <Route path="task" element={<TaskList />} />
           <Route path="file" element={<RemoteLoader module="components-file-manager:FileListPage" />} />
           <Route path="signature" element={<RemoteLoader module="components-admin:Signature" />} />
           <Route path="*" element={<Admin baseUrl={`${baseUrl}/admin`} />} />
@@ -72,7 +72,7 @@ const App = createWithRemoteLoader({
             />
           }
         >
-          <Route path="*" element={<RemoteLoader key="client" module="data-label-task:Client" />} />
+          <Route path="*" element={<Client />} />
         </Route>
         <Route element={<BeforeLoginLayout />}>
           <Route path="error" element={<Error />} />
