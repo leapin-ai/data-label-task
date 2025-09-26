@@ -18,7 +18,7 @@ const List = createWithRemoteLoader({
       title: label,
       ellipsis: true,
       valueOf: item => {
-        return needAnnotate ? item.taskCase?.result?.[name] : item[name];
+        return needAnnotate ? String(item.taskCase?.result?.[name]) : item[name];
       }
     };
   });

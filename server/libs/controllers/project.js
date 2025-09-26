@@ -23,7 +23,7 @@ module.exports = fp(async (fastify, options) => {
             needSearch: { type: 'boolean', default: false },
             annotateType: {
               type: 'string',
-              enum: ['string', 'text', 'richText', 'boolean', 'number', 'file', 'enum']
+              enum: ['string', 'text', 'richText', 'boolean', 'number', 'file', 'enum', 'hidden', 'compare']
             },
             annotateEnum: {
               type: 'array',

@@ -24,7 +24,7 @@ const CaseDetail = createWithRemoteLoader({
   const [usePreset, InfoPage, CentralContent, Enum, EditorContent, Editor, LoadingButton, FormInfo, useModal] = remoteModules;
   const { ajax, apis } = usePreset();
   const { Form, SubmitButton } = FormInfo;
-  const { Input, InputNumber, Switch, TextArea, Select, Upload } = FormInfo.fields;
+  const { Input, InputNumber, Switch, TextArea, Select, Upload, RadioGroup } = FormInfo.fields;
   const currentTaskCaseIdRef = useRef(taskCaseId);
   const currentRef = useRef();
   const modal = useModal();
@@ -93,6 +93,42 @@ const CaseDetail = createWithRemoteLoader({
             data.taskCase?.id ? newSearchParams.set('taskCaseId', data.taskCase.id) : newSearchParams.delete('taskCaseId');
             return newSearchParams;
           });
+
+        const fieldList = data.task.project.fields
+          .filter(({ needAnnotate, annotateType }) => !!needAnnotate && ['compare', 'hidden'].indexOf(annotateType) === -1)
+          .map(({ name, label, annotateType, annotateRule, annotateEnum }) => {
+            if (annotateType === 'number') {
+              return <InputNumber name={name} label={label} rule={annotateRule} />;
+            }
+            if (annotateType === 'boolean') {
+              return <Switch name={name} label={label} rule={annotateRule} />;
+            }
+            if (annotateType === 'enum') {
+              return <Select name={name} label={label} rule={annotateRule} options={annotateEnum} />;
+            }
+            if (annotateType === 'text') {
+              return <TextArea name={name} label={label} rule={annotateRule} />;
+            }
+            if (annotateType === 'richText') {
+              return <Editor name={name} label={label} rule={annotateRule} />;
+            }
+            if (annotateType === 'file') {
+              return <Upload name={name} label={label} rule={annotateRule} />;
+            }
+            return <Input name={name} label={label} rule={annotateRule} />;
+          });
+
+        const compareOptions = data.task.project.fields
+          .filter(({ annotateType }) => annotateType === 'compare')
+          .map(({ name }) => {
+            const value = data.taskCase?.dataSource.data[name];
+            return { value: name, label: value };
+          });
+
+        if (compareOptions.length > 0) {
+          fieldList.push(<RadioGroup name="__compare" className={style['compare-field']} label="比较内容" description="请选择一个你认为更好的内容" rule="REQ" options={compareOptions} />);
+        }
+
         return (
           <div ref={currentRef}>
             <InfoPage>
@@ -192,6 +228,11 @@ const CaseDetail = createWithRemoteLoader({
                   key={data.taskCase.id}
                   data={data.taskCase.result}
                   onSubmit={async formData => {
+                    const compare = formData.__compare;
+                    delete formData.__compare;
+                    compareOptions.forEach(item => {
+                      formData[item.value] = item.value === compare;
+                    });
                     const { data: resData } = await ajax(
                       Object.assign({}, apis.client.taskCase.submit, {
                         data: Object.assign({}, { id: data.taskCase.id, result: formData })
@@ -219,33 +260,7 @@ const CaseDetail = createWithRemoteLoader({
                     });
                   }}
                 >
-                  <FormInfo
-                    column={1}
-                    list={data.task.project.fields
-                      .filter(({ needAnnotate }) => !!needAnnotate)
-                      .map(({ name, label, annotateType, annotateRule, annotateEnum }) => {
-                        if (annotateType === 'number') {
-                          return <InputNumber name={name} label={label} rule={annotateRule} />;
-                        }
-                        if (annotateType === 'boolean') {
-                          return <Switch name={name} label={label} rule={annotateRule} />;
-                        }
-                        if (annotateType === 'enum') {
-                          return <Select name={name} label={label} rule={annotateRule} options={annotateEnum} />;
-                        }
-                        if (annotateType === 'text') {
-                          return <TextArea name={name} label={label} rule={annotateRule} />;
-                        }
-                        if (annotateType === 'richText') {
-                          return <Editor name={name} label={label} rule={annotateRule} />;
-                        }
-                        if (annotateType === 'file') {
-                          return <Upload name={name} label={label} rule={annotateRule} />;
-                        }
-
-                        return <Input name={name} label={label} rule={annotateRule} />;
-                      })}
-                  />
+                  <FormInfo column={1} list={fieldList} />
                   <Flex gap={8} justify="center">
                     <LoadingButton
                       onClick={async () => {
@@ -320,7 +335,10 @@ const CaseList = createWithRemoteLoader({
           return {
             name: name,
             title: label,
-            ellipsis: true
+            ellipsis: true,
+            valueOf: item => {
+              return String(item[name]);
+            }
           };
         });
         return [
