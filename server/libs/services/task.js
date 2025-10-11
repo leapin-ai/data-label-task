@@ -4,6 +4,7 @@ const exceljs = require('exceljs');
 const JSZip = require('jszip');
 const transform = require('lodash/transform');
 const pick = require('lodash/pick');
+const groupBy = require('lodash/groupBy');
 
 module.exports = fp(async (fastify, options) => {
   const { models, services } = fastify[options.name];
@@ -267,7 +268,7 @@ module.exports = fp(async (fastify, options) => {
         : [];
 
     const dataSourceList = await models.dataSource.findAll({
-      attributes: ['id'],
+      attributes: ['id', 'groupName', 'groupIndex'],
       where: Object.assign(
         {},
         {
@@ -281,8 +282,12 @@ module.exports = fp(async (fastify, options) => {
       )
     });
 
-    const taskCount = Math.ceil(dataSourceList.length / count);
-    const dataSourceIds = dataSourceList.map(({ id }) => id);
+    const { _others, ...groups } = groupBy(dataSourceList, item => {
+      return item.groupName || '_others';
+    });
+
+    const groupKeys = Object.keys(Object.assign({}, groups));
+    const taskCount = Math.ceil(((_others?.length || 0) + groupKeys.length) / count);
 
     for (let i = 0; i < taskCount; i++) {
       const task = await models.task.create({
@@ -292,7 +297,17 @@ module.exports = fp(async (fastify, options) => {
         description,
         createdUserId: authenticatePayload.id
       });
-      const target = dataSourceIds.splice(0, count);
+
+      const target = [];
+      const groupKeysTemp = groupKeys.splice(0, count);
+      groupKeysTemp.forEach(groupName => {
+        target.push(...groups[groupName].map(({ id }) => id).sort((a, b) => a.groupIndex - b.groupIndex));
+      });
+      if (count - groupKeysTemp.length > 0) {
+        _others.splice(0, count - groupKeysTemp.length).forEach(item => {
+          target.push(item.id);
+        });
+      }
       await models.taskCase.bulkCreate(
         target.map(dataSourceId => {
           return { dataSourceId, taskId: task.id };

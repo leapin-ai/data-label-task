@@ -106,14 +106,7 @@ const DataSource = createWithRemoteLoader({
       </Flex>
       <TablePage
         {...Object.assign({}, apis.dataSource.list, {
-          params: { projectId: data.id },
-          transformData: data => {
-            return Object.assign({}, data, {
-              pageData: data.pageData.map(item => {
-                return Object.assign({}, item.data, { id: item.id });
-              })
-            });
-          }
+          params: { projectId: data.id }
         })}
         name="data-source-list"
         pagination={{ paramsType: 'params' }}
@@ -124,11 +117,22 @@ const DataSource = createWithRemoteLoader({
             name: 'id',
             title: 'ID'
           },
+          {
+            name: 'groupName',
+            title: '分组'
+          },
+          {
+            name: 'groupIndex',
+            title: '分组排序'
+          },
           ...data.fields.map(({ name, label }) => {
             return {
-              name: name,
+              name: `_${data}_${name}`,
               title: label,
-              ellipsis: true
+              ellipsis: true,
+              valueOf: item => {
+                return item.data?.[name];
+              }
             };
           })
         ]}
