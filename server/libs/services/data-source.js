@@ -34,22 +34,24 @@ module.exports = fp(async (fastify, options) => {
           if (row.number === 1) {
             return;
           }
-          output.push(
-            transform(
+          output.push({
+            data: transform(
               project.fields,
               (result, value, index) => {
                 result[value.name] = row.values[index + 1];
               },
               {}
-            )
-          );
+            ),
+            groupName: row.values[project.fields.length + 1],
+            groupIndex: row.values[project.fields.length + 2]
+          });
         });
       })
     );
 
     return await models.dataSource.bulkCreate(
-      output.map(data => {
-        return { data, projectId };
+      output.map(item => {
+        return { ...item, projectId };
       })
     );
   };
@@ -62,12 +64,23 @@ module.exports = fp(async (fastify, options) => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet(project.name);
     // 设置列头和数据
-    worksheet.columns = project.fields.map(({ name, label }) => {
-      return {
-        header: label,
-        key: name
-      };
-    });
+    worksheet.columns = [
+      ...project.fields.map(({ name, label }) => {
+        return {
+          header: label,
+          key: name
+        };
+      }),
+      {
+        header: 'groupName',
+        key: 'groupName'
+      },
+      {
+        header: 'groupIndex',
+        key: 'groupIndex'
+      }
+    ];
+
     const headerRow = worksheet.getRow(1);
     headerRow.eachCell(cell => {
       cell.font = {

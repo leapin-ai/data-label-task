@@ -18,7 +18,18 @@ const List = createWithRemoteLoader({
       title: label,
       ellipsis: true,
       valueOf: item => {
-        return needAnnotate ? String(item.taskCase?.result?.[name]) : item[name];
+        if (!needAnnotate) {
+          return item.data?.[name];
+        }
+        if (annotateType === 'compare') {
+          return (
+            <>
+              {item.taskCase?.result?.[name] ? <Icon colorful type="icon-color-success-shuangse" className={style['task-icon']} /> : null}&nbsp;
+              {item.data?.[name]}
+            </>
+          );
+        }
+        return String(item.taskCase?.result?.[name]);
       }
     };
   });
@@ -49,7 +60,7 @@ const List = createWithRemoteLoader({
                 text: '未完成'
               };
         }
-      },
+      } /*,
       {
         name: 'options',
         title: '操作',
@@ -62,7 +73,7 @@ const List = createWithRemoteLoader({
             }
           ];
         }
-      }
+      }*/
     );
   }
   return (
@@ -140,14 +151,7 @@ const List = createWithRemoteLoader({
       )}
       <TablePage
         {...Object.assign({}, apis.task.caseList, {
-          params: { id: data.id, type: activeKey },
-          transformData: data => {
-            return Object.assign({}, data, {
-              pageData: data.pageData.map(item => {
-                return Object.assign({}, item.data, { id: item.id, taskCase: item.taskCase });
-              })
-            });
-          }
+          params: { id: data.id, type: activeKey }
         })}
         name="task-case-list"
         pagination={{ paramsType: 'params' }}
