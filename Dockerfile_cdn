@@ -7,6 +7,7 @@ RUN cd /node-app && npm install --production
 WORKDIR /node-app
 
 COPY ./server/libs ./libs
+COPY ./server/sql ./sql
 COPY ./server/messageTemplate ./messageTemplate
 COPY ./server/* ./
 
