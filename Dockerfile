@@ -17,6 +17,7 @@ RUN npm run build
 WORKDIR /node-app
 
 COPY ./server/libs ./libs
+COPY ./server/sql ./sql
 COPY ./server/messageTemplate ./messageTemplate
 COPY ./server/* ./
 
