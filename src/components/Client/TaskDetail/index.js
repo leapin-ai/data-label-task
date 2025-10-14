@@ -218,7 +218,10 @@ const CaseDetail = createWithRemoteLoader({
                     .map(({ name, label }) => {
                       return {
                         name,
-                        title: label
+                        title: label,
+                        render: item => {
+                          return <div dangerouslySetInnerHTML={{ __html: item }} />;
+                        }
                       };
                     })}
                 />
