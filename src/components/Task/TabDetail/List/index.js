@@ -29,7 +29,7 @@ const List = createWithRemoteLoader({
             </>
           );
         }
-        return String(item.taskCase?.result?.[name] || '');
+        return item.taskCase?.result?.[name] !== void 0 ? String(item.taskCase?.result?.[name]) : '';
       }
     };
   });
