@@ -22,6 +22,7 @@ const App = createWithRemoteLoader({
             <AfterAdminUserLoginLayout
               navigation={{
                 base: `${baseUrl}/admin`,
+                defaultTitle: 'LeapIn数据标注平台',
                 list: [
                   {
                     key: 'project',
@@ -67,6 +68,7 @@ const App = createWithRemoteLoader({
             <AfterUserLoginLayout
               baseUrl={baseUrl}
               navigation={{
+                defaultTitle: 'LeapIn数据标注平台',
                 showIndex: false
               }}
             />
