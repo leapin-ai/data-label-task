@@ -357,7 +357,7 @@ module.exports = fp(async (fastify, options) => {
           model: fastify.account.models.user,
           foreignKey: 'allocatorUserId',
           as: 'allocatorUser',
-          attributes: ['id', 'nickname', 'email', 'phone', 'avatar']
+          attributes: ['id', 'nickname', 'email', 'phone']
         }
       ],
       where: {
@@ -411,7 +411,7 @@ module.exports = fp(async (fastify, options) => {
         { header: '项目名称', key: 'projectName', width: 30 },
         { header: '状态', key: 'status', width: 15 },
         { header: '完成时间', key: 'completeTime', width: 20 },
-        { header: '耗时', key: 'costTime', width: 20 },
+        { header: '耗时(s)', key: 'costTime', width: 20 },
         { header: '分配人ID', key: 'allocatorUserId', width: 20 },
         { header: '分配人昵称', key: 'allocatorUserName', width: 40 }
       ];
@@ -430,7 +430,7 @@ module.exports = fp(async (fastify, options) => {
         completeTime: t.completeTime,
         costTime,
         allocatorUserId: t.allocatorUser?.id,
-        allocatorUserName: t.allocatorUser?.nickname
+        allocatorUserName: t.allocatorUser?.nickname || t.allocatorUser?.email || t.allocatorUser?.phone
       });
 
       return {
