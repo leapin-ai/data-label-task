@@ -393,7 +393,7 @@ module.exports = fp(async (fastify, options) => {
             (target, value) => {
               const { name, needAnnotate } = value;
               if (needAnnotate) {
-                target[name] = result[name] + (dataSource?.data?.[name] ? `\t${dataSource?.data?.[name]}` : '');
+                target[name] = (result[name] || '') + (dataSource?.data?.[name] ? `\t${dataSource?.data?.[name]}` : '');
               } else {
                 target[name] = dataSource?.data?.[name];
               }
