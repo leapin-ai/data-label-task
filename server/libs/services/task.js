@@ -5,6 +5,7 @@ const JSZip = require('jszip');
 const transform = require('lodash/transform');
 const pick = require('lodash/pick');
 const groupBy = require('lodash/groupBy');
+const dayjs = require('dayjs');
 
 module.exports = fp(async (fastify, options) => {
   const { models, services } = fastify[options.name];
@@ -351,7 +352,13 @@ module.exports = fp(async (fastify, options) => {
           model: models.taskCase,
           include: [models.dataSource]
         },
-        models.project
+        models.project,
+        {
+          model: fastify.account.models.user,
+          foreignKey: 'allocatorUserId',
+          as: 'allocatorUser',
+          attributes: ['id', 'nickname', 'email', 'phone', 'avatar']
+        }
       ],
       where: {
         id: {
@@ -386,7 +393,7 @@ module.exports = fp(async (fastify, options) => {
             (target, value) => {
               const { name, needAnnotate } = value;
               if (needAnnotate) {
-                target[name] = result[name];
+                target[name] = result[name] + (dataSource?.data?.[name] ? `\t${dataSource?.data?.[name]}` : '');
               } else {
                 target[name] = dataSource?.data?.[name];
               }
@@ -403,8 +410,16 @@ module.exports = fp(async (fastify, options) => {
         { header: '任务描述', key: 'description', width: 40 },
         { header: '项目名称', key: 'projectName', width: 30 },
         { header: '状态', key: 'status', width: 15 },
-        { header: '完成时间', key: 'completeTime', width: 20 }
+        { header: '完成时间', key: 'completeTime', width: 20 },
+        { header: '耗时', key: 'costTime', width: 20 },
+        { header: '分配人ID', key: 'allocatorUserId', width: 20 },
+        { header: '分配人昵称', key: 'allocatorUserName', width: 40 }
       ];
+
+      const costTime = t.taskCases.reduce((output, { startTime, completeTime }) => {
+        return output + dayjs(completeTime).diff(dayjs(startTime), 'second');
+      }, 0);
+
       // 添加数据行
       worksheet.addRow({
         id: t.id,
@@ -412,7 +427,10 @@ module.exports = fp(async (fastify, options) => {
         description: t.description,
         projectName: t.project.name,
         status: t.status,
-        completeTime: t.completeTime
+        completeTime: t.completeTime,
+        costTime,
+        allocatorUserId: t.allocatorUser?.id,
+        allocatorUserName: t.allocatorUser?.nickname
       });
 
       return {
