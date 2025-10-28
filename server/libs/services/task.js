@@ -401,9 +401,9 @@ module.exports = fp(async (fastify, options) => {
             transform(
               t.project.fields,
               (target, value) => {
-                const { name, needAnnotate } = value;
+                const { name, needAnnotate, annotateType } = value;
                 if (needAnnotate) {
-                  target[name] = (result[name] || '') + (dataSource?.data?.[name] !== void 0 ? `\t${String(dataSource?.data?.[name])}` : '');
+                  target[name] = (result[name] !== void 0 ? String(result[name]) : '') + (dataSource?.data?.[name] !== void 0 ? `\t${String(dataSource?.data?.[name])}` : '');
                 } else {
                   target[name] = dataSource?.data?.[name];
                 }
