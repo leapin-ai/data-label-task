@@ -378,27 +378,41 @@ module.exports = fp(async (fastify, options) => {
       const workbook = new exceljs.Workbook();
       const taskCaseWorksheet = workbook.addWorksheet('标注数据');
 
-      taskCaseWorksheet.columns = t.project.fields.map(({ name, label }) => {
-        return {
-          header: label,
-          key: name,
-          width: 40
-        };
-      });
+      taskCaseWorksheet.columns = t.project.fields
+        .map(({ name, label }) => {
+          return {
+            header: label,
+            key: name,
+            width: 40
+          };
+        })
+        .concat([
+          {
+            header: '耗时(s)',
+            key: 'costTime',
+            width: 20
+          }
+        ]);
 
-      t.taskCases.forEach(({ result, dataSource }) => {
+      t.taskCases.forEach(({ result, dataSource, startTime, completeTime }) => {
         taskCaseWorksheet.addRow(
-          transform(
-            t.project.fields,
-            (target, value) => {
-              const { name, needAnnotate } = value;
-              if (needAnnotate) {
-                target[name] = (result[name] || '') + (dataSource?.data?.[name] ? `\t${dataSource?.data?.[name]}` : '');
-              } else {
-                target[name] = dataSource?.data?.[name];
-              }
-            },
-            {}
+          Object.assign(
+            {},
+            transform(
+              t.project.fields,
+              (target, value) => {
+                const { name, needAnnotate } = value;
+                if (needAnnotate) {
+                  target[name] = (result[name] || '') + (dataSource?.data?.[name] ? `\t${dataSource?.data?.[name]}` : '');
+                } else {
+                  target[name] = dataSource?.data?.[name];
+                }
+              },
+              {}
+            ),
+            {
+              costTime: dayjs(completeTime).diff(dayjs(startTime), 'second')
+            }
           )
         );
       });
