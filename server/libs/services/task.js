@@ -378,23 +378,27 @@ module.exports = fp(async (fastify, options) => {
       const workbook = new exceljs.Workbook();
       const taskCaseWorksheet = workbook.addWorksheet('标注数据');
 
-      taskCaseWorksheet.columns = t.project.fields
-        .map(({ name, label }) => {
+      taskCaseWorksheet.columns = [
+        {
+          header: 'ID',
+          key: 'id',
+          width: 40
+        },
+        ...t.project.fields.map(({ name, label }) => {
           return {
             header: label,
             key: name,
             width: 40
           };
-        })
-        .concat([
-          {
-            header: '耗时(s)',
-            key: 'costTime',
-            width: 20
-          }
-        ]);
+        }),
+        {
+          header: '耗时(s)',
+          key: 'costTime',
+          width: 20
+        }
+      ];
 
-      t.taskCases.forEach(({ result, dataSource, startTime, completeTime }) => {
+      t.taskCases.forEach(({ id, result, dataSource, startTime, completeTime }) => {
         taskCaseWorksheet.addRow(
           Object.assign(
             {},
@@ -411,6 +415,7 @@ module.exports = fp(async (fastify, options) => {
               {}
             ),
             {
+              id,
               costTime: dayjs(completeTime).diff(dayjs(startTime), 'second')
             }
           )
