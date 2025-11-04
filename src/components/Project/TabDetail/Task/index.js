@@ -20,7 +20,7 @@ const Task = createWithRemoteLoader({
   const { TablePage, useSelectedRow } = Table;
   const selectedRow = useSelectedRow();
   const { selectedRowKeys, setSelectedRowKeys } = selectedRow;
-  const { Input, DatePicker, InputNumber } = FormInfo.fields;
+  const { Input, DatePicker, InputNumber, Upload } = FormInfo.fields;
   return (
     <Flex vertical gap={8} flex={1}>
       <Flex justify="space-between">
@@ -53,6 +53,7 @@ const Task = createWithRemoteLoader({
                       <Input name="name" label="任务名称" rule="REQ LEN-0-100" />,
                       <UserSelect name="allocatorUserId" label="指派人" single interceptor="object-output-value" />,
                       <DatePicker name="completeTime" label="截止日期" rule="REQ" format="YYYY-MM-DD" inputReadOnly disabledDate={current => current && current < new Date()} />,
+                      <Upload name="taskFile" label="任务项" />,
                       <Editor name="description" label="任务描述" />
                     ]}
                   />
