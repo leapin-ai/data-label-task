@@ -5,14 +5,53 @@ const JSZip = require('jszip');
 const transform = require('lodash/transform');
 const pick = require('lodash/pick');
 const groupBy = require('lodash/groupBy');
+const uniq = require('lodash/uniq');
 const dayjs = require('dayjs');
+const ExcelJS = require('exceljs');
 
 module.exports = fp(async (fastify, options) => {
   const { models, services } = fastify[options.name];
   const { Op } = fastify.sequelize.Sequelize;
 
-  const create = async (authenticatePayload, data) => {
-    return await models.task.create(Object.assign({}, data, { createdUserId: authenticatePayload.id }));
+  const create = async (authenticatePayload, { taskFile, ...data }) => {
+    const newTask = await models.task.create(Object.assign({}, data, { createdUserId: authenticatePayload.id }));
+    const output = [];
+    if (taskFile && taskFile.length > 0) {
+      for (let file of taskFile) {
+        const { buffer } = await fastify.fileManager.services.getFileBlob({ id: file.id });
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.load(buffer);
+        const worksheet = workbook.getWorksheet(1);
+        worksheet.eachRow(row => {
+          if (row.number === 1) {
+            return;
+          }
+          output.push(row.values[1]);
+        });
+      }
+    }
+
+    const taskCase = await models.taskCase.findAll({
+      where: {
+        id: {
+          [Op.in]: uniq(output)
+        }
+      }
+    });
+
+    if (taskCase.length > 0) {
+      await models.taskCase.bulkCreate(
+        taskCase.map(item => {
+          return {
+            taskId: newTask.id,
+            dataSourceId: item.dataSourceId,
+            allocatorUserId: authenticatePayload.id
+          };
+        })
+      );
+    }
+
+    return newTask;
   };
 
   const save = async (authenticatePayload, { id, ...data }) => {
